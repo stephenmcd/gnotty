@@ -10,8 +10,11 @@ class BaseIRCClient(SimpleIRCClient):
 
     def __init__(self, host, port, channel, nickname):
         SimpleIRCClient.__init__(self)
+        self.host = host
+        self.port = port
         self.channel = channel
-        self.connect(host, port, nickname)
+        self.nickname = nickname
+        self.connect(self.host, self.port, self.nickname)
 
     def get_nickname(self, event):
         """
@@ -24,6 +27,19 @@ class BaseIRCClient(SimpleIRCClient):
         Join the channel once connected to the IRC server.
         """
         connection.join(self.channel)
+
+    def on_nicknameinuse(self, connection, event):
+        """
+        Increment a digit to the nickname if it's in use, and
+        re-connect.
+        """
+        digits = ""
+        while self.nickname[-1].isdigit():
+            digits = self.nickname[-1] + digits
+            self.nickname = self.nickname[:-1]
+        digits = 1 if not digits else int(digits) + 1
+        self.nickname += str(digits)
+        self.connect(self.host, self.port, self.nickname)
 
 
 class LoggingIRCClient(BaseIRCClient):
@@ -62,7 +78,6 @@ class WebSocketIRCClient(BaseIRCClient):
     """
 
     def __init__(self, host, port, channel, nickname, namespace):
-        self.nickname = nickname
         self.nicknames = []
         self.namespace = namespace
         BaseIRCClient.__init__(self, host, port, channel, nickname)
