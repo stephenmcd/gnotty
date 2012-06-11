@@ -31,21 +31,29 @@ class LoggingIRCClient(BaseIRCClient):
     Subclassable IRC client that simply logs each channel message.
     """
 
-    def log(self, nickname, message):
+    def log(self, **kwargs):
         """
-        Log handler - subclass me.
+        Log handler - override me.
         """
-        print "%s: %s" % (nickname, message)
+        print "[%(server)s%(channel)s] %(nickname)s: %(message)s" % kwargs
+
+    def log_args(self, event, message):
+        return {
+            "server": self.connection.server,
+            "channel": self.channel,
+            "nickname": self.get_nickname(event),
+            "message": message,
+        }
 
     def on_join(self, connection, event):
-        self.log(self.get_nickname(event), "joins")
+        self.log(**self.log_args(event, "joins"))
 
     def on_quit(self, connection, event):
-        self.log(self.get_nickname(event), "joins")
+        self.log(**self.log_args(event, "joins"))
 
     def on_pubmsg(self, connection, event):
         for message in event.arguments():
-            self.log(self.get_nickname(event), message)
+            self.log(**self.log_args(event, message))
 
 
 class WebSocketIRCClient(BaseIRCClient):

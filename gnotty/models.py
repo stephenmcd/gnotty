@@ -7,6 +7,8 @@ class IRCMessage(models.Model):
 
     nickname = models.CharField(max_length=100)
     message = models.TextField()
+    server = models.CharField(max_length=100)
+    channel = models.CharField(max_length=100)
     message_time = models.DateTimeField()
 
     def save(self, *args, **kwargs):

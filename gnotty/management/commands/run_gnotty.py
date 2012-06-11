@@ -12,8 +12,9 @@ from gnotty.models import IRCMessage
 
 class ModelLoggingIRCClient(LoggingIRCClient):
 
-    def log(self, nickname, message):
-        IRCMessage.objects.create(nickname=nickname, message=message)
+    def log(self, **kwargs):
+        LoggingIRCClient.log(self, **kwargs)
+        IRCMessage.objects.create(**kwargs)
 
 
 class Command(BaseCommand):
