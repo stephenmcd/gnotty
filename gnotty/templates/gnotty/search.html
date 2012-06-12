@@ -1,0 +1,13 @@
+
+<form>
+    <input type="text" name="q" value="{{ request.GET.q }}">
+    <input type="submit">
+</form>
+
+{% for message in messages %}
+<p><a href="{{ message.get_absolute_url }}">{{ message }}</a></p>
+{% empty %}
+{% if request.GET.q %}
+<p>No results for {{ request.GET.q }}</p>
+{% endif %}
+{% endfor %}

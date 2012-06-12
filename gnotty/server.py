@@ -50,7 +50,7 @@ class IRCApplication(object):
             socketio_manage(environ, {"": IRCNamespace})
         elif environ["PATH_INFO"] == "/":
             d = os.path.dirname(__file__)
-            with open(os.path.join(d, "templates", "index.html"), "r") as f:
+            with open(os.path.join(d, "templates", "gnotty", "chat.html"), "r") as f:
                 start_response("200 OK", [("Content-Type", "text/html")])
                 return [f.read()]
         start_response("404 Not Found", [])

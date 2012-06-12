@@ -1,4 +1,5 @@
 
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
@@ -25,6 +26,14 @@ class IRCMessage(models.Model):
         return "[%s] %s%s %s: %s" % (self.message_time, self.server,
                                      self.channel, self.nickname,
                                      self.short_message())
+
+    def get_absolute_url(self):
+        kwargs = {
+            "year": self.message_time.year,
+            "month": self.message_time.month,
+            "day": self.message_time.day,
+        }
+        return reverse("gnotty_day", kwargs=kwargs) + "#%s" % self.id
 
     def short_message(self):
         return self.message[:50]

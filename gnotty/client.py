@@ -30,7 +30,7 @@ class BaseIRCClient(SimpleIRCClient):
 
     def on_nicknameinuse(self, connection, event):
         """
-        Increment a digit to the nickname if it's in use, and
+        Increment a digit on the nickname if it's in use, and
         re-connect.
         """
         digits = ""

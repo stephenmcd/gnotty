@@ -1,0 +1,7 @@
+
+<p>Showing messages for {{ day }}</p>
+{% for message in messages %}
+<p id="{{ message.id }}">{{ message }}</p>
+{% empty %}
+<p>No messages.</p>
+{% endfor %}
