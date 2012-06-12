@@ -3,10 +3,10 @@
 <head>
 
 <head>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/json2/20110223/json2.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.8.2/socket.io.min.js"></script>
-<script src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.min.js"></script>
+<script src="{{ STATIC_URL }}js/json2.js"></script>
+<script src="{{ STATIC_URL }}js/socket.io.min.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.tmpl.min.js"></script>
 <script>
 
 $(function() {
@@ -33,9 +33,9 @@ $(function() {
     var start = function(nickname) {
 
         started = true;
-        socket = io.connect();
+        socket = io.connect('{{ HTTP_HOST }}:{{ HTTP_PORT }}');
         socket.on('connect', function() {
-            socket.emit('start', 'localhost', 6667, '#test', nickname);
+            socket.emit('start', '{{ IRC_HOST }}', {{ IRC_PORT }}, '{{ IRC_CHANNEL }}', nickname);
             $('.hidden').show();
             $('#submit').val('Send');
         });

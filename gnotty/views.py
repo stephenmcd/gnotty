@@ -1,16 +1,22 @@
 
 from datetime import datetime
+
+from django.conf import settings
 from django.db.models import Q
 from django.shortcuts import render
 
 from gnotty.models import IRCMessage
+from gnotty.settings import (IRC_HOST, IRC_PORT, IRC_CHANNEL,
+                             HTTP_HOST, HTTP_PORT)
 
 
 def chat(request, template="gnotty/chat.html"):
     context = {
-        "host": "localhost",
-        "port": 6667,
-        "channel": "#test"
+        "IRC_HOST": IRC_HOST,
+        "IRC_PORT": IRC_PORT,
+        "IRC_CHANNEL": IRC_CHANNEL,
+        "HTTP_HOST": HTTP_HOST,
+        "HTTP_PORT": HTTP_PORT,
     }
     return render(request, template, context)
 

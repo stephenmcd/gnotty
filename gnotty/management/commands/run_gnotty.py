@@ -6,8 +6,11 @@ patch_all()
 from django.core.management.base import BaseCommand
 
 from gnotty.client import LoggingIRCClient
-from gnotty.server import run
 from gnotty.models import IRCMessage
+from gnotty.server import serve
+from gnotty.settings import (IRC_HOST, IRC_PORT, IRC_CHANNEL, LOGGER_NICKNAME,
+                             HTTP_HOST, HTTP_PORT)
+
 
 
 class ModelLoggingIRCClient(LoggingIRCClient):
@@ -20,6 +23,7 @@ class ModelLoggingIRCClient(LoggingIRCClient):
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        gnotty = ModelLoggingIRCClient("localhost", 6667, "#test", "gnotty")
+        gnotty = ModelLoggingIRCClient(IRC_HOST, IRC_PORT, IRC_CHANNEL,
+                                       LOGGER_NICKNAME)
         spawn(gnotty.start)
-        run()
+        serve(HTTP_HOST, HTTP_PORT)

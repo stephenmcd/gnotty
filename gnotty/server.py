@@ -5,12 +5,14 @@ monkey.patch_all()
 
 import os
 import sys
+from mimetypes import guess_type
 
 from socketio import socketio_manage
 from socketio.server import SocketIOServer
 from socketio.namespace import BaseNamespace
 
 from gnotty.client import WebSocketIRCClient
+from gnotty import settings
 
 
 class IRCNamespace(BaseNamespace):
@@ -46,16 +48,37 @@ class IRCApplication(object):
         """
         WSGI application handler.
         """
-        if environ["PATH_INFO"].startswith("/socket.io/"):
+        path = os.path.normpath(environ["PATH_INFO"]).lstrip("/")
+        if not path:
+            path = os.path.join("templates", "gnotty", "chat.html")
+        if path.startswith("socket.io/"):
             socketio_manage(environ, {"": IRCNamespace})
-        elif environ["PATH_INFO"] == "/":
-            d = os.path.dirname(__file__)
-            with open(os.path.join(d, "templates", "gnotty", "chat.html"), "r") as f:
-                start_response("200 OK", [("Content-Type", "text/html")])
-                return [f.read()]
-        start_response("404 Not Found", [])
-        return ["<h1>Not Found</h1>"]
+            return
+        path = os.path.join(os.path.dirname(__file__), path)
+        try:
+            with open(path, "r") as f:
+                data = f.read()
+        except IOError:
+            data = None
+        if not data:
+            start_response("404 Not Found", [])
+            return ["<h1>Not Found</h1>"]
+        setting_names = ("IRC_HOST", "IRC_PORT", "IRC_CHANNEL",
+                         "HTTP_HOST", "HTTP_PORT", "STATIC_URL")
+        for name in setting_names:
+            value = str(getattr(settings, name))
+            data = data.replace("{{ %s }}" % name, value)
+        ext = path.split(".")[-1]
+        content_type = "text/%s" % guess_type(path)[0].split("/")[-1]
+        start_response("200 OK", [("Content-Type", content_type)])
+        return [data]
 
+
+def serve(host, port):
+    print "gnotty server running on %s:%s" % (host, port)
+    server = SocketIOServer((host, port), IRCApplication(),
+                            namespace="socket.io", policy_server=False)
+    server.serve_forever()
 
 def run():
     # try:
@@ -71,7 +94,4 @@ def run():
         port = int(port)
     except ValueError:
         raise Exception("Invalid port: %s" % port)
-    print "gnotty server running on %s:%s" % (host, port)
-    server = SocketIOServer((host, port), IRCApplication(),
-                            namespace="socket.io", policy_server=False)
-    server.serve_forever()
+    serve(host, port)
