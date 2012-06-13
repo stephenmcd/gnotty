@@ -11,7 +11,7 @@ class BaseIRCClient(SimpleIRCClient):
     def __init__(self, host, port, channel, nickname):
         SimpleIRCClient.__init__(self)
         self.host = host
-        self.port = port
+        self.port = int(port) if str(port).isdigit() else 6667
         self.channel = channel
         self.nickname = nickname
         self.connect(self.host, self.port, self.nickname)
