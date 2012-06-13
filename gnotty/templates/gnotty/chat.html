@@ -12,19 +12,16 @@
 
 $(function() {
 
-    var started = false;
-
     $('form').submit(function() {
         var value = $('#message').val();
         if (value) {
-            if (!started) {
+            if ($('.hidden').length > 0) {
                 start(value);
             } else {
                 client.message(value);
             }
         }
         $('#message').val('').focus();
-        started = true;
         return false;
     });
 
@@ -44,7 +41,7 @@ $(function() {
         });
 
         client.onConnect = function() {
-            $('.hidden').show();
+            $('.hidden').removeClass('hidden');
             $('#submit').val('Send');
         };
 
@@ -76,18 +73,17 @@ $(function() {
 </script>
 <style>
 
-* {font-size:16px; font-family:sans-serif;}
 body {margin:20px 0 0 0;}
 #main {padding-bottom:100px;}
-
-form {position:fixed; bottom:0; background:#ccc; width:100%;
-      border-top:1px solid #999;}
-input {border:1px solid #999; padding:10px; border-radius:5px;}
-#message {width:600px; margin:20px 0 20px 20px;}
-#submit, #leave {cursor:pointer; margin-left:10px; padding:10px 30px;}
+form, input {border-top:1px solid #999;}
+form {position:fixed; bottom:0; background:#ccc; width:100%;}
+input {border:1px solid #999; padding:10px;}
+#message {width:50%; margin:10px;}
+#messages {font-family:monospace;}
+#submit, #leave {cursor:pointer; margin-right:10px; padding:10px 30px;}
 
 ul {margin:0; padding:0; list-style-type:none;}
-h1, p, li {margin:10px 20px;}
+p, li {margin:10px 20px;}
 
 #nicknames {position:fixed; right:0; top:0; bottom:0; width:200px;
             background:#eee; overflow:hidden; border-left:1px solid #ccc;}
@@ -100,7 +96,7 @@ h1, p, li {margin:10px 20px;}
 <body>
 
 <script id="messages-template" type="text/x-jquery-tmpl">
-    <li>(${time}) ${nickname}: ${message}</li>
+    <li>[${time}] <strong>${nickname}:</strong> ${message}</li>
 </script>
 <script id="nicknames-template" type="text/x-jquery-tmpl">
     <li>${nickname}</li>
