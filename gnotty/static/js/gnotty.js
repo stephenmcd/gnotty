@@ -1,5 +1,5 @@
 
-var Gnotty = function(options) {
+var IRCClient = function(options) {
 
     var self = this;
     var socket = io.connect(options.httpHost + ':' + options.httpPort)
