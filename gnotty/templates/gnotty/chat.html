@@ -7,6 +7,7 @@
 <script src="{{ STATIC_URL }}js/json2.js"></script>
 <script src="{{ STATIC_URL }}js/socket.io.min.js"></script>
 <script src="{{ STATIC_URL }}js/jquery.tmpl.min.js"></script>
+<script src="{{ STATIC_URL }}js/gnotty.js"></script>
 <script>
 
 $(function() {
@@ -19,10 +20,11 @@ $(function() {
             if (!started) {
                 start(value);
             } else {
-                socket.emit('message', value);
+                client.message(value);
             }
         }
         $('#message').val('').focus();
+        started = true;
         return false;
     });
 
@@ -32,22 +34,28 @@ $(function() {
 
     var start = function(nickname) {
 
-        started = true;
-        socket = io.connect('{{ HTTP_HOST }}:{{ HTTP_PORT }}');
-        socket.on('connect', function() {
-            socket.emit('start', '{{ IRC_HOST }}', {{ IRC_PORT }}, '{{ IRC_CHANNEL }}', nickname);
-            $('.hidden').show();
-            $('#submit').val('Send');
+        client = new Gnotty({
+            httpHost:     '{{ HTTP_HOST }}',
+            httpPort:     '{{ HTTP_PORT }}',
+            ircHost:      '{{ IRC_HOST }}',
+            ircPort:      '{{ IRC_PORT }}',
+            ircChannel:   '{{ IRC_CHANNEL }}',
+            ircNickname:  nickname
         });
 
-        socket.on('nicknames', function(nicknames) {
+        client.onConnect = function() {
+            $('.hidden').show();
+            $('#submit').val('Send');
+        };
+
+        client.onNicknames = function(nicknames) {
             $('#nicknames').html('')
             $.each(nicknames.sort(), function(i, nickname) {
                 $('#nicknames-template').tmpl({
                     nickname: nickname
                 }).appendTo('#nicknames');
             });
-        });
+        };
 
         var time = function() {
             var d = new Date();
@@ -57,14 +65,11 @@ $(function() {
             }).join(':');
         };
 
-        socket.on('message', function(nickname, message) {
-            $('#messages-template').tmpl({
-                time: time(),
-                nickname: nickname,
-                message: message
-            }).appendTo('#messages');
+        client.onMessage = function(data) {
+            data.time = time();
+            $('#messages-template').tmpl(data).appendTo('#messages');
             window.scrollBy(0, 10000);
-        });
+        };
 
     };
 
