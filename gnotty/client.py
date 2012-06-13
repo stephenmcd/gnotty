@@ -87,8 +87,9 @@ class WebSocketIRCClient(BaseIRCClient):
         Send a message to the channel. We also emit the message
         back to the sender's WebSocket.
         """
-        self.connection.privmsg(self.channel, message)
-        self.namespace.emit("message", self.nickname, message)
+        if self.nickname in self.nicknames:
+            self.connection.privmsg(self.channel, message)
+            self.namespace.emit("message", self.nickname, message)
 
     def emit_nicknames(self):
         """
