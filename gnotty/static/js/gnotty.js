@@ -1,4 +1,28 @@
 
+/*
+
+Manages a connection to an IRC room - takes an options objects
+that should include the following members:
+
+    - httpHost:     HTTP host for the gnotty WebSocket server.
+    - httpPort:     HTTP port for the gnotty WebSocket server.
+    - ircHost:      IRC host to connect to.
+    - ircPort:      IRC port to connect to.
+    - ircChannel:   IRC channel to join.
+    - ircNickname:  IRC nickname.
+
+The follwing methods are implemented:
+
+    - message(message):         Sends a message string to the channel
+    - onConnect():              Called when the client has joined the channel
+    - onNickNames(nicknames):   Called each time someone joins or leaves the
+                                channel, nicknames is an unsorted array of
+                                strings.
+    - onMessage(message):       Called when a message is received from the
+                                channel, message is an object with nickname
+                                and message string members.
+
+*/
 var IRCClient = function(options) {
 
     var self = this;

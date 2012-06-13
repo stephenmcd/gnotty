@@ -12,6 +12,55 @@
 
 $(function() {
 
+    // Main setup function called when nickname is entered.
+    // Creates IRC client and sets up event handlers.
+    var start = function(nickname) {
+
+        client = new IRCClient({
+            httpHost:     '{{ HTTP_HOST }}',
+            httpPort:     '{{ HTTP_PORT }}',
+            ircHost:      '{{ IRC_HOST }}',
+            ircPort:      '{{ IRC_PORT }}',
+            ircChannel:   '{{ IRC_CHANNEL }}',
+            ircNickname:  nickname
+        });
+
+        // Once connected, show the 'leaves' button, user list,
+        // and change the submit text to 'Send' for sending messages.
+        client.onConnect = function() {
+            $('.hidden').removeClass('hidden');
+            $('#submit').val('Send');
+        };
+
+        // Render the nickanmes list each time we receive it,
+        // which is each time someone joins or leaves.
+        client.onNicknames = function(nicknames) {
+            $('#nicknames').html('')
+            $.each(nicknames.sort(), function(i, nickname) {
+                $('#nicknames-template').tmpl({
+                    nickname: nickname
+                }).appendTo('#nicknames');
+            });
+        };
+
+        // Add a timestamp to each message as we receive it, and
+        // add it to the messages display. Also scroll the window.
+        client.onMessage = function(data) {
+            var d = new Date();
+            var parts = [d.getHours(), d.getMinutes(), d.getSeconds()];
+            data.time = $.map(parts, function(s) {
+                return (String(s).length == 1 ? '0' : '') + s;
+            }).join(':');
+            $('#messages-template').tmpl(data).appendTo('#messages');
+            window.scrollBy(0, 10000);
+        };
+
+    };
+
+    // Main submit handler - if there are still hidden elements,
+    // we haevn't connected yet, so the value submitted is the
+    // initial nickname. Otherwise we've started, and the value
+    // submitted is a message.
     $('form').submit(function() {
         var value = $('#message').val();
         if (value) {
@@ -25,47 +74,14 @@ $(function() {
         return false;
     });
 
+    // Leaves just reloads - this will trigger a disconnect for
+    // the client.
     $('#leave').click(function() {
         location.reload();
     });
 
-    var start = function(nickname) {
-
-        client = new IRCClient({
-            httpHost:     '{{ HTTP_HOST }}',
-            httpPort:     '{{ HTTP_PORT }}',
-            ircHost:      '{{ IRC_HOST }}',
-            ircPort:      '{{ IRC_PORT }}',
-            ircChannel:   '{{ IRC_CHANNEL }}',
-            ircNickname:  nickname
-        });
-
-        client.onConnect = function() {
-            $('.hidden').removeClass('hidden');
-            $('#submit').val('Send');
-        };
-
-        client.onNicknames = function(nicknames) {
-            $('#nicknames').html('')
-            $.each(nicknames.sort(), function(i, nickname) {
-                $('#nicknames-template').tmpl({
-                    nickname: nickname
-                }).appendTo('#nicknames');
-            });
-        };
-
-        client.onMessage = function(data) {
-            var d = new Date();
-            var parts = [d.getHours(), d.getMinutes(), d.getSeconds()];
-            data.time = $.map(parts, function(s) {
-                return (String(s).length == 1 ? '0' : '') + s;
-            }).join(':');
-            $('#messages-template').tmpl(data).appendTo('#messages');
-            window.scrollBy(0, 10000);
-        };
-
-    };
-
+    // Don't show the main form until we're loaded, and focus it.
+    $('form').removeClass('hidden');
     $('#message').val('').focus();
 
 });
@@ -107,7 +123,7 @@ p, li {margin:10px 20px;}
 <ul id="nicknames" class="hidden"></ul>
 </div>
 
-<form>
+<form class="hidden">
     <input type="text" id="message" name="message">
     <input type="submit" id="submit" value="Join">
     <input type="button" id="leave" value="Leave" class="hidden">
