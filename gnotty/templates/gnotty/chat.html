@@ -57,16 +57,12 @@ $(function() {
             });
         };
 
-        var time = function() {
+        client.onMessage = function(data) {
             var d = new Date();
             var parts = [d.getHours(), d.getMinutes(), d.getSeconds()];
-            return $.map(parts, function(s) {
+            data.time = $.map(parts, function(s) {
                 return (String(s).length == 1 ? '0' : '') + s;
             }).join(':');
-        };
-
-        client.onMessage = function(data) {
-            data.time = time();
             $('#messages-template').tmpl(data).appendTo('#messages');
             window.scrollBy(0, 10000);
         };
