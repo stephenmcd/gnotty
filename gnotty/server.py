@@ -32,7 +32,8 @@ class IRCNamespace(BaseNamespace):
         """
         Message received from a WebSocket - send it to the IRC channel.
         """
-        self.client.emit_message(message)
+        if hasattr(self, "client"):
+            self.client.emit_message(message)
 
     def disconnect(self, silent=False):
         """
