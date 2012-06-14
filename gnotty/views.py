@@ -1,5 +1,5 @@
 
-from datetime import datetime
+from datetime import date
 
 from django.conf import settings
 from django.db.models import Q
@@ -26,13 +26,15 @@ def search(request, template="gnotty/search.html"):
     query = request.REQUEST.get("q")
     if query:
         search = Q(message__icontains=query) | Q(nickname__icontains=query)
-        messages = IRCMessage.objects.filter(search)
+        messages = IRCMessage.objects.filter(search).order_by("-message_time")
     context = {"messages": messages}
     return render(request, template, context)
 
 
 def day(request, year, month, day, template="gnotty/day.html"):
-    date = datetime(year=int(year), month=int(month), day=int(day))
-    messages = IRCMessage.objects.filter(message_time_date=date)
-    context = {"messages": messages}
+    day_date = date(year=int(year), month=int(month), day=int(day))
+    messages = IRCMessage.objects.filter(message_time__year=year,
+                                         message_time__month=month,
+                                         message_time__day=day)
+    context = {"messages": messages, "date": day_date}
     return render(request, template, context)

@@ -27,13 +27,14 @@ class IRCMessage(models.Model):
                                      self.channel, self.nickname,
                                      self.short_message())
 
+    @models.permalink
     def get_absolute_url(self):
         kwargs = {
             "year": self.message_time.year,
             "month": self.message_time.month,
             "day": self.message_time.day,
         }
-        return reverse("gnotty_day", kwargs=kwargs) + "#%s" % self.id
+        return ("gnotty_day", (), kwargs)
 
     def short_message(self):
         return self.message[:50]

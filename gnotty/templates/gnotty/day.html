@@ -1,7 +1,38 @@
+<!doctype html>
+<html lang="en">
 
-<p>Showing messages for {{ day }}</p>
+<head>
+<style>
+table {border-spacing:0; margin:20px 0; width:100%;}
+td {border-top:1px solid #ccc; padding:10px 20px 10px 10px; margin:0; vertical-align:top; white-space:nowrap;}
+.wide {width:100%; white-space:normal;}
+#message-{{ request.GET.id }} {background:#ccc;}
+</style>
+<script>
+if (!location.hash) {
+    location += '#message-{{ request.GET.id }}';
+    setTimeout(function() {
+        scrollBy(0, -100);
+    }, 100);
+}
+</script>
+</head>
+
+<body>
+
+<p>Showing messages for {{ date }}</p>
+
+<table>
 {% for message in messages %}
-<p id="{{ message.id }}">{{ message }}</p>
+<tr id="message-{{ message.id }}">
+    <td>{{ message.message_time|date:"H:i:s" }}</td>
+    <td>{{ message.nickname }}</td>
+    <td class="wide">{{ message.short_message }}</td>
+</tr>
 {% empty %}
 <p>No messages.</p>
 {% endfor %}
+</table>
+
+</body>
+</html>
