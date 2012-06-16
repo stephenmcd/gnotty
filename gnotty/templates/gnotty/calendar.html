@@ -1,18 +1,19 @@
-<!doctype html>
-<html lang="en">
+{% extends "gnotty/base.html" %}
 
-<head>
-<link rel="stylesheet" href="{{ STATIC_URL }}css/gnotty.css">
-</head>
-
-<body>
+{% block content %}
 {% for month in months %}
-<table class="calendar">
-<tr><th colspan="7">{{ month.month|date:"N Y" }}</th></tr>
-{% for week in month.weeks %}
+
+{% if forloop.counter0|divisibleby:3 %}
+<div class="row">
+{% endif %}
+
+<div class="span4">
+<table class="table table-striped calendar">
+    <tr><th colspan="7"><h2>{{ month.month|date:"N Y" }}</h2></th></tr>
+    {% for week in month.weeks %}
     <tr>
     {% for day in week %}
-    <td{% if not day.in_month %} style="color:#ccc;"{% endif %}>
+    <td{% if not day.in_month %} class="not-in-month"{% endif %}>
         {% if day.has_messages %}
         <a href="{% url gnotty_day day.date.year day.date.month day.date.day %}">{{ day.date.day }}</a>
         {% else %}
@@ -21,8 +22,13 @@
     </td>
     {% endfor %}
     </tr>
-{% endfor %}
+    {% endfor %}
 </table>
+</div>
+
+{% if forloop.last or forloop.counter|divisibleby:3 %}
+</div>
+{% endif %}
+
 {% endfor %}
-</body>
-</html>
+{% endblock %}

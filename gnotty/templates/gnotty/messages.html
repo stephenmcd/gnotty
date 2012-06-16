@@ -1,8 +1,7 @@
-<!doctype html>
-<html lang="en">
+{% extends "gnotty/base.html" %}
 
-<head>
-<link rel="stylesheet" href="{{ STATIC_URL }}css/gnotty.css">
+{% block extrahead %}
+{{ block.super }}
 {% if request.GET.id %}
 <style>#message-{{ request.GET.id }} {background:#ccc;}</style>
 <script>
@@ -17,34 +16,26 @@ if (!location.hash) {
 }
 </script>
 {% endif %}
-</head>
+{% endblock %}
 
-
-<body>
-
-<table>
+{% block content %}
+<table class="table table-striped">
 {% for message in messages %}
 {% with message.message_time.date as day %}
 {% ifchanged day %}
-<tr>
-    <th colspan="4" align="left">{{ day }}</th>
-</tr>
+<tr><th colspan="{% if request.GET.q %}4{% else %}3{% endif %}"><h2>{{ day }}</h2></th></tr>
 {% endifchanged %}
 <tr id="message-{{ message.id }}">
+    {% if request.GET.q %}
+    <td><a class="btn btn-mini btn-primary" href="{{ message.get_absolute_url }}?id={{ message.id }}">View</a></td>
+    {% endif %}
     <td>{{ message.message_time|date:"H:i:s" }}</td>
     <td>{{ message.nickname }}</td>
-    <td>{{ message.short_message }}</td>
-    <td>
-        {% if request.GET.q %}
-        <a href="{{ message.get_absolute_url }}?id={{ message.id }}">View</a>
-        {% endif %}
-    </td>
+    <td class="message">{{ message.short_message }}</td>
 </tr>
 {% endwith %}
 {% empty %}
 <p>No messages.</p>
 {% endfor %}
 </table>
-
-</body>
-</html>
+{% endblock %}

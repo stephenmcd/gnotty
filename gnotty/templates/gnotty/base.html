@@ -1,0 +1,32 @@
+{% load gnotty_tags %}<!doctype html>
+<html lang="en">
+
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.spacelab.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.responsive.css">
+<style>
+table {margin-top:-15px;}
+th {border-top:30px solid #fff !important;}
+.calendar th, .calendar td {text-align:center;}
+.calendar .not-in-month {color:#ddd;}
+.calendar a {font-weight:bold; text-decoration:underline;}
+.message {width:100%;}
+.dropdown-menu a {text-align:right;}
+</style>
+<script src="{{ STATIC_URL }}js/jquery.min.js"></script>
+<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+<!--[if lt IE 9]>
+<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+{% block extrahead %}{% endblock %}
+</head>
+
+<body>
+{% gnotty_header %}
+<div class="container">
+{% block content %}{% endblock %}
+</div>
+</body>
+</html>
