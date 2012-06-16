@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/gnotty.css">
+{% if request.GET.id %}
+<style>#message-{{ request.GET.id }} {background:#ccc;}</style>
+<script>
+if (!location.hash) {
+    location += '#message-{{ request.GET.id }}';
+    var scrollInterval = setInterval(function() {
+        if (location.hash) {
+            scrollBy(0, -100);
+            clearInterval(scrollInterval);
+        }
+    }, 100);
+}
+</script>
+{% endif %}
+</head>
+
+
+<body>
+
+<table>
+{% for message in messages %}
+{% with message.message_time.date as day %}
+{% ifchanged day %}
+<tr>
+    <th colspan="4" align="left">{{ day }}</th>
+</tr>
+{% endifchanged %}
+<tr id="message-{{ message.id }}">
+    <td>{{ message.message_time|date:"H:i:s" }}</td>
+    <td>{{ message.nickname }}</td>
+    <td>{{ message.short_message }}</td>
+    <td>
+        {% if request.GET.q %}
+        <a href="{{ message.get_absolute_url }}?id={{ message.id }}">View</a>
+        {% endif %}
+    </td>
+</tr>
+{% endwith %}
+{% empty %}
+<p>No messages.</p>
+{% endfor %}
+</table>
+
+</body>
+</html>

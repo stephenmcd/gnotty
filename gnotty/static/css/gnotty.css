@@ -1,0 +1,8 @@
+
+* {font-family:georgia, serif; font-size:16px;}
+table {border-spacing:0; margin:0 40px 40px 0; float:left;}
+th, td {padding:5px; margin:0;}
+th {font-size:24px; padding:20px 0;}
+td {border-top:1px solid #ccc;}
+
+.calendar td {padding:10px 20px 10px 10px; text-align:center;}
