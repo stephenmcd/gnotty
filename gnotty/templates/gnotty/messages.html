@@ -23,7 +23,11 @@ if (!location.hash) {
 {% for message in messages %}
 {% with message.message_time.date as day %}
 {% ifchanged day %}
-<tr><th colspan="{% if request.GET.q %}4{% else %}3{% endif %}"><h2>{{ day }}</h2></th></tr>
+<tr>
+    <th colspan="{% if request.GET.q %}4{% else %}3{% endif %}">
+        <h2><a href="{% url gnotty_day day.year day.month day.day %}">{{ day }}</a></h2>
+    </th>
+</tr>
 {% endifchanged %}
 <tr id="message-{{ message.id }}">
     {% if request.GET.q %}
