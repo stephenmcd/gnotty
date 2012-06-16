@@ -48,15 +48,19 @@ def calendar(request, year=None, month=None, template="gnotty/calendar.html"):
     Show calendar months for the given year/month.
     """
 
-    days = [d.date() for d in IRCMessage.objects.dates("message_time", "day")]
-    min_date, max_date = days[0], days[-1]
-    days = set(days)
-    months = []
-    calendar = Calendar(SUNDAY)
     try:
         year = int(year)
     except TypeError:
         year = datetime.now().year
+    lookup = {"message_time__year": year}
+    if month:
+        loopup["message_time__month"] = month
+    days = [d.date() for d in
+            IRCMessage.objects.filter(**lookup).dates("message_time", "day")]
+    min_date, max_date = days[0], days[-1]
+    days = set(days)
+    months = []
+    calendar = Calendar(SUNDAY)
 
     for m in range(1, 13) if not month else [int(month)]:
         lt_max = m <= max_date.month or year < max_date.year
