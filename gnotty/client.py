@@ -78,7 +78,7 @@ class WebSocketIRCClient(BaseIRCClient):
     """
 
     def __init__(self, host, port, channel, nickname, namespace):
-        self.nicknames = []
+        self.nicknames = set()
         self.namespace = namespace
         BaseIRCClient.__init__(self, host, port, channel, nickname)
 
@@ -96,14 +96,15 @@ class WebSocketIRCClient(BaseIRCClient):
         Send the nickname list to the Websocket. Called whenever the
         nicknames list changes.
         """
-        self.namespace.emit("nicknames", self.nicknames)
+        self.namespace.emit("nicknames", list(self.nicknames))
 
     def on_namreply(self, connection, event):
         """
         Initial list of nicknames received - remove op/voice prefixes,
         and send the list to the WebSocket.
         """
-        self.nicknames = [s.lstrip("@+") for s in event.arguments()[-1].split()]
+        nicknames = [s.lstrip("@+") for s in event.arguments()[-1].split()]
+        self.nicknames |= set(nicknames)
         self.emit_nicknames()
 
     def on_join(self, connection, event):
@@ -111,8 +112,9 @@ class WebSocketIRCClient(BaseIRCClient):
         Someone joined the channel - send the nicknames list to the
         WebSocket.
         """
-        self.nicknames.append(self.get_nickname(event))
-        self.namespace.emit("message", self.nickname, "joins")
+        nickname = self.get_nickname(event)
+        self.nicknames.add(nickname)
+        self.namespace.emit("message", nickname, "joins")
         self.emit_nicknames()
 
     def on_quit(self, connection, event):
@@ -120,8 +122,9 @@ class WebSocketIRCClient(BaseIRCClient):
         Someone left the channel - send the nicknames list to the
         WebSocket.
         """
-        self.nicknames.remove(self.get_nickname(event))
-        self.namespace.emit("message", self.nickname, "leaves")
+        nickname = self.get_nickname(event)
+        self.nicknames.remove(nickname)
+        self.namespace.emit("message", nickname, "leaves")
         self.emit_nicknames()
 
     def on_pubmsg(self, connection, event):
