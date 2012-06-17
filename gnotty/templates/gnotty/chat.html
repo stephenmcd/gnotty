@@ -58,7 +58,7 @@ $(function() {
     // we haevn't connected yet, so the value submitted is the
     // initial nickname. Otherwise we've started, and the value
     // submitted is a message.
-    $('form').submit(function() {
+    $('.chat').submit(function() {
         var value = $('#input').val();
         if (value) {
             if ($('.hidden').length > 0) {
