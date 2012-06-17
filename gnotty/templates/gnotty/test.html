@@ -1,0 +1,42 @@
+<html>
+<head>
+<script src="http://127.0.0.1:8000/static/js/json2.js"></script>
+<script src="http://127.0.0.1:8000/static/js/socket.io.min.js"></script>
+<script src="http://127.0.0.1:8000/static/js/gnotty.js"></script>
+<script>
+
+/***************************************************\
+*                                                   *
+*   FOR TESTING ONLY - DON'T USE ON A REAL SERVER   *
+*                                                   *
+\***************************************************/
+
+var testConns = function(form) {
+    for (var i = 0; i < form.num.value; i++) {
+        var client = new IRCClient({
+            httpHost:     '127.0.0.1',
+            httpPort:     '8080',
+            ircHost:      'localhost',
+            ircPort:      '6667',
+            ircChannel:   '#test',
+            ircNickname:  'test' + i
+        });
+        client.onConnect = function() {
+            var output = form.output;
+            output.value += this.ircNickname + ' connected\n';
+            output.scrollTop = output.scrollHeight - output.clientHeight;
+        }
+    }
+    return false;
+};
+
+</script>
+</head>
+<body>
+<form onsubmit="return testConns(this);">
+    Number of connections:
+    <input name="num" type="text" value="1000"><input type="submit"><br>
+    <textarea name="output" style="width:100%; height:80%;"></textarea>
+</form>
+</body>
+</html>
