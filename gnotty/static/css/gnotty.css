@@ -1,6 +1,7 @@
 
-body {margin:60px 0 70px 0;}
-footer {position:fixed; bottom:0; background:#ddd; width:100%; border-top:1px solid #999;}
+
+footer {position:fixed; left:0; bottom:0; background:#ddd; width:100%;
+        border-top:1px solid #999; padding:0 20px;}
 
 table {margin-top:-15px;}
 th {border-top:30px solid #fff !important;}
@@ -17,12 +18,20 @@ th {border-top:30px solid #fff !important;}
 .nicknames-wrap {margin-left:-50px;}
 
 .dropdown-menu a {text-align:right;}
-.chat {margin-bottom:0; padding:15px 0;}
+.chat {margin-top:5px; margin-bottom:0; padding:15px 0;}
 .chat input {margin-right:15px;}
 .hidden {display: none;}
 
-.powered {float:right; margin:10px;}
+.powered {padding:10px 0;}
 
 @media (min-width: 979px) {
+    body {margin:60px 0 70px 0;}
+}
 
+@media (min-width: 767px) {
+    .powered {margin:0 10px; text-align:right;}
+}
+
+@media (max-width: 767px) {
+    #input {max-width:50%;}
 }

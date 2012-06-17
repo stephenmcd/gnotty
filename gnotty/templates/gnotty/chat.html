@@ -26,8 +26,11 @@ $(function() {
         // Once connected, show the 'leaves' button, user list,
         // and change the submit text to 'Send' for sending messages.
         client.onConnect = function() {
-            $('.hidden').removeClass('hidden');
-            $('#submit').val('Send');
+            $('#input').animate({width: '65%'}, function() {
+                $('.hidden').slideDown(function() {
+                    $('#submit').val('Send');
+                }).removeClass('hidden');
+            });
         };
 
         // Render the nickanmes list each time we receive it,

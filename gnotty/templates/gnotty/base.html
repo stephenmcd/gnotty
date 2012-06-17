@@ -22,13 +22,15 @@
 </div>
 <footer>
 <form class="container form-inline chat" action="{% url gnotty_chat %}">
-<p class="powered">Powered by <a href="#">gnotty</a></p>
-<div class="control-group">
+<div class="row">
+<div class="span9 control-group">
 <div class="controls">
     <input type="text" class="input-xlarge" id="input" name="nickname">
     <input type="submit" class="btn btn-primary" id="submit" value="Join">
     <input type="button" class="btn hidden" id="leave" value="Leave">
 </div>
+</div>
+<p class="span3 powered">Powered by <a href="http://github.com/stephenmcd/gnotty">gnotty</a></p>
 </div>
 </form>
 </footer>
