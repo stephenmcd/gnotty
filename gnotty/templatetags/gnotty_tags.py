@@ -9,8 +9,8 @@ from gnotty.settings import IRC_CHANNEL
 register = template.Library()
 
 
-@register.inclusion_tag("gnotty/includes/header.html")
-def gnotty_header():
+@register.inclusion_tag("gnotty/includes/nav.html")
+def gnotty_nav():
     min_max = IRCMessage.objects.aggregate(Min("message_time"),
                                            Max("message_time"))
     if min_max:
