@@ -45,33 +45,59 @@ class IRCNamespace(BaseNamespace):
 
 class IRCApplication(object):
 
+    def index(self):
+        """
+        Loads the chat interface template, dealing with the
+        Django template bits.
+        """
+        root_dir = os.path.dirname(__file__)
+        template_dir = os.path.join(root_dir, "templates", "gnotty")
+        with open(os.path.join(template_dir, "base.html"), "r") as f:
+            base = f.read()
+        with open(os.path.join(template_dir, "chat.html"), "r") as f:
+            base = base.replace("{% block content %}", f.read())
+        for remove in ("block content", "endblock", "gnotty_nav",
+                       "load gnotty_tags", "extends \"gnotty/base.html\""):
+            base = base.replace("{% " + remove + " %}", "")
+        setting_names = ("IRC_HOST", "IRC_PORT", "IRC_CHANNEL",
+                         "HTTP_HOST", "HTTP_PORT", "STATIC_URL")
+        for name in setting_names:
+            value = str(getattr(settings, name))
+            base = base.replace("{{ %s }}" % name, value)
+        return base
+
+    def static(self, path):
+        """
+        Loads a static file.
+        """
+        path = os.path.join(os.path.dirname(__file__), path)
+        content_type = "text/%s" % guess_type(path)[0].split("/")[-1]
+        try:
+            with open(path, "r") as f:
+                return f.read()
+        except IOError:
+            pass
+
     def __call__(self, environ, start_response):
         """
         WSGI application handler.
         """
         path = os.path.normpath(environ["PATH_INFO"]).lstrip("/")
-        if not path:
-            path = os.path.join("templates", "gnotty", "chat.html")
         if path.startswith("socket.io/"):
             socketio_manage(environ, {"": IRCNamespace})
             return
-        path = os.path.join(os.path.dirname(__file__), path)
-        try:
-            with open(path, "r") as f:
-                data = f.read()
-        except IOError:
-            data = None
+        content_type = "text/html"
+        status = "200 OK"
+        if not path:
+            data = self.index()
+        else:
+            data = self.static(path)
+            if data:
+                content_type = "text/%s" % guess_type(path)[0].split("/")[-1]
         if not data:
-            start_response("404 Not Found", [])
-            return ["<h1>Not Found</h1>"]
-        setting_names = ("IRC_HOST", "IRC_PORT", "IRC_CHANNEL",
-                         "HTTP_HOST", "HTTP_PORT", "STATIC_URL")
-        for name in setting_names:
-            value = str(getattr(settings, name))
-            data = data.replace("{{ %s }}" % name, value)
-        ext = path.split(".")[-1]
-        content_type = "text/%s" % guess_type(path)[0].split("/")[-1]
-        start_response("200 OK", [("Content-Type", content_type)])
+            status = "404 Not Found"
+            data = "<h1>Not Found</h1>"
+        start_response(status, [("Content-Type", content_type)])
         return [data]
 
 
@@ -80,6 +106,7 @@ def serve(host, port):
     server = SocketIOServer((host, port), IRCApplication(),
                             namespace="socket.io", policy_server=False)
     server.serve_forever()
+
 
 def run():
     # try:
