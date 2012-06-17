@@ -1,8 +1,7 @@
-<!doctype html>
-<html lang="en">
+{% extends "gnotty/base.html" %}
 
-<head>
-<script src="{{ STATIC_URL }}js/jquery.min.js"></script>
+{% block extrahead %}
+{{ block.super }}
 <script src="{{ STATIC_URL }}js/json2.js"></script>
 <script src="{{ STATIC_URL }}js/socket.io.min.js"></script>
 <script src="{{ STATIC_URL }}js/jquery.tmpl.min.js"></script>
@@ -34,12 +33,8 @@ $(function() {
         // Render the nickanmes list each time we receive it,
         // which is each time someone joins or leaves.
         client.onNicknames = function(nicknames) {
-            $('#nicknames').html('')
-            $.each(nicknames.sort(), function(i, nickname) {
-                $('#nicknames-template').tmpl({
-                    nickname: nickname
-                }).appendTo('#nicknames');
-            });
+            var data = {nicknames: nicknames.sort()};
+            $('#nicknames').html($('#nicknames-template').tmpl(data));
         };
 
         // Add a timestamp to each message as we receive it, and
@@ -61,7 +56,7 @@ $(function() {
     // initial nickname. Otherwise we've started, and the value
     // submitted is a message.
     $('form').submit(function() {
-        var value = $('#message').val();
+        var value = $('#input').val();
         if (value) {
             if ($('.hidden').length > 0) {
                 start(value);
@@ -69,64 +64,46 @@ $(function() {
                 client.message(value);
             }
         }
-        $('#message').val('').focus();
+        $('#input').val('').focus();
         return false;
     });
 
     // Leaves just reloads - this will trigger a disconnect for
     // the client.
     $('#leave').click(function() {
-        location.reload();
+        location = location.href.split('?')[0];
     });
 
     // Don't show the main form until we're loaded, and focus it.
-    $('form').removeClass('hidden');
-    $('#message').val('').focus();
+    $('#input').val('').focus();
+    {% if request.GET.nickname %}
+    start('{{ request.GET.nickname|escapejs }}');
+    {% endif %}
 
 });
 
 </script>
-<style>
+{% endblock %}
 
-body {margin:20px 0 0 0;}
-#main {padding-bottom:100px;}
-form, input {border-top:1px solid #999;}
-form {position:fixed; bottom:0; background:#ccc; width:100%;}
-input {border:1px solid #999; padding:10px;}
-#message {width:50%; margin:10px;}
-#messages {font-family:monospace;}
-#submit, #leave {cursor:pointer; margin-right:10px; padding:10px 30px;}
-
-ul {margin:0; padding:0; list-style-type:none;}
-p, li {margin:10px 20px;}
-
-#nicknames {position:fixed; right:0; top:0; bottom:0; width:200px;
-            background:#eee; overflow:hidden; border-left:1px solid #ccc;}
-
-.hidden {display: none;}
-
-</style>
-</head>
-
-<body>
-
+{% block content %}
 <script id="messages-template" type="text/x-jquery-tmpl">
-    <li>[${time}] <strong>${nickname}:</strong> ${message}</li>
+    <tr><td>[${time}]</td><td>${nickname}:</td><td class="message">${message}</td></td>
 </script>
 <script id="nicknames-template" type="text/x-jquery-tmpl">
-    <li>${nickname}</li>
+    <ul class="nav nav-list">
+    <li class="nav-header">Users</li>
+    {% templatetag openvariable %}each nicknames{% templatetag closevariable %}
+    <li>${$value}</li>
+    {% templatetag openvariable %}/each{% templatetag closevariable %}
 </script>
 
-<div id="main">
-<ul id="messages"></ul>
-<ul id="nicknames" class="hidden"></ul>
+<div class="row nicknames-row hidden">
+<div class="nicknames-wrap">
+<div id="nicknames" class="span2 offset10 well"></div>
+</div>
 </div>
 
-<form class="hidden">
-    <input type="text" id="message" name="message">
-    <input type="submit" id="submit" value="Join">
-    <input type="button" id="leave" value="Leave" class="hidden">
-</form>
-
-</body>
-</html>
+<div class="row">
+<div class="span9"><table class="table table-striped table-condensed" id="messages"></table></div>
+</div>
+{% endblock %}

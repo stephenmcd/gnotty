@@ -6,15 +6,7 @@
 <meta name="viewport" content="width=device-width">
 <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.spacelab.css">
 <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.responsive.css">
-<style>
-table {margin-top:-15px;}
-th {border-top:30px solid #fff !important;}
-.calendar th, .calendar td {text-align:center;}
-.calendar .not-in-month {color:#ddd;}
-.calendar a {font-weight:bold; text-decoration:underline;}
-.message {width:100%;}
-.dropdown-menu a {text-align:right;}
-</style>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/gnotty.css">
 <script src="{{ STATIC_URL }}js/jquery.min.js"></script>
 <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 <!--[if lt IE 9]>
@@ -28,5 +20,17 @@ th {border-top:30px solid #fff !important;}
 <div class="container">
 {% block content %}{% endblock %}
 </div>
+<footer>
+<form class="container form-inline chat" action="{% url gnotty_chat %}">
+<p class="powered">Powered by <a href="#">gnotty</a></p>
+<div class="control-group">
+<div class="controls">
+    <input type="text" class="input-xlarge" id="input" name="nickname">
+    <input type="submit" class="btn btn-primary" id="submit" value="Join">
+    <input type="button" class="btn hidden" id="leave" value="Leave">
+</div>
+</div>
+</form>
+</footer>
 </body>
 </html>

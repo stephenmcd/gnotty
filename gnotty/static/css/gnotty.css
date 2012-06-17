@@ -1,0 +1,28 @@
+
+body {margin:60px 0 70px 0;}
+footer {position:fixed; bottom:0; background:#ddd; width:100%; border-top:1px solid #999;}
+
+table {margin-top:-15px;}
+th {border-top:30px solid #fff !important;}
+.calendar th, .calendar td {text-align:center;}
+.calendar .not-in-month {color:#ddd;}
+.calendar a {font-weight:bold; text-decoration:underline;}
+
+.message {width:100%;}
+#messages td {font-family:Menlo,Monaco,'Courier New',monospace; border:0;}
+.message-highlighted td {background:#ffc !important;}
+
+#nicknames {margin-bottom:0;}
+.nicknames-row {position:fixed; top:60px; bottom:90px; overflow-y:scroll;}
+.nicknames-wrap {margin-left:-50px;}
+
+.dropdown-menu a {text-align:right;}
+.chat {margin-bottom:0; padding:15px 0;}
+.chat input {margin-right:15px;}
+.hidden {display: none;}
+
+.powered {float:right; margin:10px;}
+
+@media (min-width: 979px) {
+
+}

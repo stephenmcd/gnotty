@@ -3,8 +3,10 @@
 {% block extrahead %}
 {{ block.super }}
 {% if request.GET.id %}
-<style>#message-{{ request.GET.id }} {background:#ccc;}</style>
 <script>
+$(function() {
+    $('#message-{{ request.GET.id }}').addClass('message-highlighted');
+});
 if (!location.hash) {
     location += '#message-{{ request.GET.id }}';
     var scrollInterval = setInterval(function() {
@@ -19,7 +21,7 @@ if (!location.hash) {
 {% endblock %}
 
 {% block content %}
-<table class="table table-striped">
+<table class="table table-striped" id="messages">
 {% for message in messages %}
 {% with message.message_time.date as day %}
 {% ifchanged day %}
