@@ -10,6 +10,18 @@
 
 $(function() {
 
+    // Assign a dark colour to each nickname.
+    var colors = {};
+    var color = function(nickname) {
+        if (!colors[nickname]) {
+            var c = function() {
+                return Math.ceil(Math.random() * 150);
+            };
+            colors[nickname] = 'rgb(' + c() + ',' + c() + ',' + c() + ')';
+        }
+        return colors[nickname];
+    };
+
     // Main setup function called when nickname is entered.
     // Creates IRC client and sets up event handlers.
     var start = function(nickname) {
@@ -36,7 +48,10 @@ $(function() {
         // Render the nickanmes list each time we receive it,
         // which is each time someone joins or leaves.
         client.onNicknames = function(nicknames) {
-            var data = {nicknames: nicknames.sort()};
+            nicknames = $.map(nicknames.sort(), function(nickname) {
+                return {nickname: nickname, color: color(nickname)};
+            });
+            var data = {nicknames: nicknames};
             $('#nicknames').html($('#nicknames-template').tmpl(data));
         };
 
@@ -47,7 +62,8 @@ $(function() {
             var parts = [d.getHours(), d.getMinutes(), d.getSeconds()];
             data.time = $.map(parts, function(s) {
                 return (String(s).length == 1 ? '0' : '') + s;
-            }).join(':');
+            }).join(':')
+            data.color = color(data.nickname);
             $('#messages-template').tmpl(data).appendTo('#messages');
             window.scrollBy(0, 10000);
         };
@@ -90,13 +106,13 @@ $(function() {
 
 {% block content %}
 <script id="messages-template" type="text/x-jquery-tmpl">
-    <tr><td>[${time}]</td><td>${nickname}:</td><td class="message">${message}</td></td>
+    <tr><td>[${time}]</td><td style="color:${color};">${nickname}:</td><td class="message">${message}</td></td>
 </script>
 <script id="nicknames-template" type="text/x-jquery-tmpl">
     <ul class="nav nav-list">
     <li class="nav-header">Users</li>
     {% templatetag openvariable %}each nicknames{% templatetag closevariable %}
-    <li>${$value}</li>
+    <li class="nickname" style="color:${$value.color};">${$value.nickname}</li>
     {% templatetag openvariable %}/each{% templatetag closevariable %}
 </script>
 

@@ -10,7 +10,7 @@ th {border-top:30px solid #fff !important;}
 .calendar a {font-weight:bold; text-decoration:underline;}
 
 .message {width:100%;}
-#messages td {font-family:Menlo,Monaco,'Courier New',monospace; border:0;}
+#messages td, .nickname {font-family:Menlo,Monaco,'Courier New',monospace; border:0;}
 .message-highlighted td {background:#ffc !important;}
 
 #nicknames {margin-bottom:0;}
