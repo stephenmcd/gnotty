@@ -26,6 +26,10 @@ The follwing methods are implemented:
 var IRCClient = function(options) {
 
     var self = this;
+    for (var k in options) {
+        self[k] = options[k];
+    }
+
     var socket = io.connect(options.httpHost + ':' + options.httpPort)
 
     self.message = function(message) {
