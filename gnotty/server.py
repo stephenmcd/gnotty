@@ -45,6 +45,9 @@ class IRCNamespace(BaseNamespace):
 
 class IRCApplication(object):
 
+    def __init__(self, socketio_only=False):
+        self.socketio_only = socketio_only
+
     def index(self):
         """
         Loads the chat interface template, manually dealing with the
@@ -94,24 +97,30 @@ class IRCApplication(object):
         if path.startswith("socket.io/"):
             socketio_manage(environ, {"": IRCNamespace})
             return
-        content_type = "text/html"
+
         status = "200 OK"
-        if not path:
-            data = self.index()
-        else:
-            data = self.static(path)
-            if data:
-                content_type = "text/%s" % guess_type(path)[0].split("/")[-1]
+        content_type = "text/html"
+        data = None
+
+        if not self.socketio_only:
+            if not path:
+                data = self.index()
+            else:
+                data = self.static(path)
+                if data:
+                    content_type = guess_type(path)[0]
+                    print content_type
         if not data:
             status = "404 Not Found"
             data = "<h1>Not Found</h1>"
+
         start_response(status, [("Content-Type", content_type)])
         return [data]
 
 
-def serve(host, port):
+def serve_forever(host, port, socketio_only=False):
     print "gnotty server running on %s:%s" % (host, port)
-    server = SocketIOServer((host, port), IRCApplication(),
+    server = SocketIOServer((host, port), IRCApplication(socketio_only),
                             namespace="socket.io", policy_server=False)
     server.serve_forever()
 
@@ -130,4 +139,4 @@ def run():
         port = int(port)
     except ValueError:
         raise Exception("Invalid port: %s" % port)
-    serve(host, port)
+    serve_forever(host, port)

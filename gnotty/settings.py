@@ -1,8 +1,12 @@
 
+import os
+
 try:
-    from django.conf import settings
-except ImportError:
+    os.environ["DJANGO_SETTINGS_MODULE"]
+except KeyError:
     settings = None
+else:
+    from django.conf import settings
 
 
 IRC_HOST = getattr(settings, "GNOTTY_IRC_HOST", "irc.freenode.net")

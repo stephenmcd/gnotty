@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 
 from gnotty.client import LoggingIRCClient
 from gnotty.models import IRCMessage
-from gnotty.server import serve
+from gnotty.server import serve_forever
 from gnotty.settings import (IRC_HOST, IRC_PORT, IRC_CHANNEL, LOGGER_NICKNAME,
                              HTTP_HOST, HTTP_PORT)
 
@@ -26,4 +26,4 @@ class Command(BaseCommand):
         gnotty = ModelLoggingIRCClient(IRC_HOST, IRC_PORT, IRC_CHANNEL,
                                        LOGGER_NICKNAME)
         spawn(gnotty.start)
-        serve(HTTP_HOST, HTTP_PORT)
+        serve_forever(HTTP_HOST, HTTP_PORT, socketio_only=True)
