@@ -12,7 +12,7 @@ from socketio.server import SocketIOServer
 from socketio.namespace import BaseNamespace
 
 from gnotty.client import WebSocketIRCClient
-from gnotty import settings
+from gnotty import settings, __version__
 
 
 class IRCNamespace(BaseNamespace):
@@ -47,6 +47,7 @@ class IRCApplication(object):
 
     def __init__(self, socketio_only=False):
         self.socketio_only = socketio_only
+        self.server_string = "gnotty/%s" % __version__
 
     def index(self):
         """
@@ -114,14 +115,18 @@ class IRCApplication(object):
             status = "404 Not Found"
             data = "<h1>Not Found</h1>"
 
-        start_response(status, [("Content-Type", content_type)])
+        start_response(status, [
+            ("Content-Type", content_type),
+            ("Server", self.server_string)
+        ])
         return [data]
 
 
 def serve_forever(host, port, socketio_only=False):
-    print "gnotty server running on %s:%s" % (host, port)
-    server = SocketIOServer((host, port), IRCApplication(socketio_only),
-                            namespace="socket.io", policy_server=False)
+    app = IRCApplication(socketio_only)
+    server = SocketIOServer((host, port), app, namespace="socket.io",
+                            policy_server=False)
+    print "%s listening on %s:%s" % (app.server_string, host, port)
     server.serve_forever()
 
 

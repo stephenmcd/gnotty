@@ -1,3 +1,5 @@
+Created by `Stephen McDonald <http://twitter.com/stephen_mcd>`_
+
 gnotty ties the knot between the web and IRC.
 
 gnotty is comprised of two parts:
