@@ -47,7 +47,7 @@ class IRCApplication(object):
 
     def index(self):
         """
-        Loads the chat interface template, dealing with the
+        Loads the chat interface template, manually dealing with the
         Django template bits.
         """
         root_dir = os.path.dirname(__file__)
@@ -56,9 +56,17 @@ class IRCApplication(object):
             base = f.read()
         with open(os.path.join(template_dir, "chat.html"), "r") as f:
             base = base.replace("{% block content %}", f.read())
-        for remove in ("block content", "endblock", "gnotty_nav",
-                       "load gnotty_tags", "extends \"gnotty/base.html\""):
-            base = base.replace("{% " + remove + " %}", "")
+        replace = {
+            "{% block content %}": "",
+            "{% endblock %}": "",
+            "{% gnotty_nav %}": "",
+            "{% load gnotty_tags %}": "",
+            "{% extends \"gnotty/base.html\" %}": "",
+            "{% templatetag openvariable %}": "{{",
+            "{% templatetag closevariable %}": "}}",
+        }
+        for k, v in replace.items():
+            base = base.replace(k, v)
         setting_names = ("IRC_HOST", "IRC_PORT", "IRC_CHANNEL",
                          "HTTP_HOST", "HTTP_PORT", "STATIC_URL")
         for name in setting_names:
