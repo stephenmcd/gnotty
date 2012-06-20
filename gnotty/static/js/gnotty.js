@@ -84,6 +84,7 @@ var gnotty = function(options) {
         // and change the submit text to 'Send' for sending messages.
         client.onConnect = function() {
             $('#input').animate({width: '65%'}, function() {
+                $('#input').attr('placeholder', 'message');
                 $('.hidden').slideDown(function() {
                     $('#submit').val('Send');
                 }).removeClass('hidden');
