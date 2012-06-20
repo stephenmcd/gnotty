@@ -2,7 +2,6 @@
 from calendar import Calendar, SUNDAY
 from datetime import datetime, date
 
-from django.conf import settings
 from django.db.models import Q
 from django.shortcuts import render, redirect
 
@@ -46,7 +45,7 @@ def calendar(request, year=None, month=None, template="gnotty/calendar.html"):
         year = datetime.now().year
     lookup = {"message_time__year": year}
     if month:
-        loopup["message_time__month"] = month
+        lookup["message_time__month"] = month
     days = [d.date() for d in
             IRCMessage.objects.filter(**lookup).dates("message_time", "day")]
     min_date, max_date = days[0], days[-1]

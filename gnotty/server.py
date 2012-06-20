@@ -4,7 +4,6 @@ from gevent import monkey
 monkey.patch_all()
 
 import os
-import sys
 from mimetypes import guess_type
 
 from socketio import socketio_manage
@@ -80,7 +79,6 @@ class IRCApplication(object):
         Loads a static file.
         """
         path = os.path.join(os.path.dirname(__file__), path)
-        content_type = "text/%s" % guess_type(path)[0].split("/")[-1]
         try:
             with open(path, "r") as f:
                 return f.read()
@@ -107,7 +105,6 @@ class IRCApplication(object):
                 data = self.static(path)
                 if data:
                     content_type = guess_type(path)[0]
-                    print content_type
         if not data:
             status = "404 Not Found"
             data = "<h1>Not Found</h1>"

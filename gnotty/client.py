@@ -133,5 +133,3 @@ class WebSocketIRCClient(BaseIRCClient):
         """
         for message in event.arguments():
             self.namespace.emit("message", self.get_nickname(event), message)
-
-
