@@ -11,8 +11,9 @@ from socketio import socketio_manage
 from socketio.server import SocketIOServer
 from socketio.namespace import BaseNamespace
 
+from gnotty import __version_string__
 from gnotty.client import WebSocketIRCClient
-from gnotty import settings, __version__
+from gnotty.conf import settings
 
 
 class IRCNamespace(BaseNamespace):
@@ -47,7 +48,6 @@ class IRCApplication(object):
 
     def __init__(self, socketio_only=False):
         self.socketio_only = socketio_only
-        self.server_string = "gnotty/%s" % __version__
 
     def index(self):
         """
@@ -71,11 +71,8 @@ class IRCApplication(object):
         }
         for k, v in replace.items():
             base = base.replace(k, v)
-        setting_names = ("IRC_HOST", "IRC_PORT", "IRC_CHANNEL",
-                         "HTTP_HOST", "HTTP_PORT", "STATIC_URL")
-        for name in setting_names:
-            value = str(getattr(settings, name))
-            base = base.replace("{{ %s }}" % name, value)
+        for k, v in settings:
+            base = base.replace("{{ %s }}" % k, unicode(v or ""))
         return base
 
     def static(self, path):
@@ -117,31 +114,25 @@ class IRCApplication(object):
 
         start_response(status, [
             ("Content-Type", content_type),
-            ("Server", self.server_string)
+            ("Server", __version_string__)
         ])
         return [data]
 
 
-def serve_forever(host, port, socketio_only=False):
-    app = IRCApplication(socketio_only)
-    server = SocketIOServer((host, port), app, namespace="socket.io",
-                            policy_server=False)
-    print "%s listening on %s:%s" % (app.server_string, host, port)
+def serve_forever(socketio_only=False):
+    """
+    Starts the gevent-socketio server.
+    """
+    host_port = (settings.HTTP_HOST, settings.HTTP_PORT)
+    server = SocketIOServer(host_port, IRCApplication(socketio_only),
+                            namespace="socket.io", policy_server=False)
+    print "%s listening on %s:%s" % ((__version_string__,) + host_port)
     server.serve_forever()
 
 
 def run():
-    # try:
-    #     arg = sys.argv[1]
-    # except IndexError:
-    #     arg = "0.0.0.0:8080"
-    arg = "0.0.0.0:8080"
-    try:
-        host, port = arg.split(":")
-    except ValueError:
-        host, port = "0.0.0.0", arg
-    try:
-        port = int(port)
-    except ValueError:
-        raise Exception("Invalid port: %s" % port)
-    serve_forever(host, port)
+    """
+    CLI entry point. Parses args and starts the gevent-socketio server.
+    """
+    settings.parse_args()
+    serve_forever()

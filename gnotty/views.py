@@ -7,19 +7,11 @@ from django.db.models import Q
 from django.shortcuts import render, redirect
 
 from gnotty.models import IRCMessage
-from gnotty.settings import (IRC_HOST, IRC_PORT, IRC_CHANNEL,
-                             HTTP_HOST, HTTP_PORT)
+from gnotty.conf import settings
 
 
 def chat(request, template="gnotty/chat.html"):
-    context = {
-        "IRC_HOST": IRC_HOST,
-        "IRC_PORT": IRC_PORT,
-        "IRC_CHANNEL": IRC_CHANNEL,
-        "HTTP_HOST": HTTP_HOST,
-        "HTTP_PORT": HTTP_PORT,
-    }
-    return render(request, template, context)
+    return render(request, template, settings._settings)
 
 
 def messages(request, year=None, month=None, day=None,

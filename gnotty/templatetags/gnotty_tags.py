@@ -3,7 +3,7 @@ from django import template
 from django.db.models import Min, Max
 
 from gnotty.models import IRCMessage
-from gnotty.settings import IRC_CHANNEL
+from gnotty.conf import settings
 
 
 register = template.Library()
@@ -18,4 +18,4 @@ def gnotty_nav():
                       min_max["message_time__min"].year - 1, -1)
     else:
         years = []
-    return {"IRC_CHANNEL": IRC_CHANNEL, "years": years}
+    return {"IRC_CHANNEL": settings.IRC_CHANNEL, "years": years}
