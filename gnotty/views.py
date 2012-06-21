@@ -10,7 +10,7 @@ from gnotty.conf import settings
 
 
 def chat(request, template="gnotty/chat.html"):
-    return render(request, template, dict(settings))
+    return render(request, template, settings)
 
 
 def messages(request, year=None, month=None, day=None,

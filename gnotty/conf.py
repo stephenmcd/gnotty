@@ -32,12 +32,26 @@ parser.add_option("-f", "--conf-file", dest="CONF_FILE", metavar="PATH",
 
 class Settings(dict):
     """
-    Lazy-loaded settings object, backed by either Django settings,
-    or CLI args. The ``--conf-file`` CLI arg can also be used to
-    specify the path to a Python module to load the settings from.
-    Implemented settings and their defaults are defined above by the
-    ``OptionParser`` instance used for parsing CLI args.
+    Settings object, backed by either Django settings, or CLI args. The
+    ``--conf-file`` CLI arg can also be used to specify the path to a
+    Python module to load the settings from. Available settings and
+    their defaults are defined above by the ``OptionParser`` instance
+    used for parsing CLI args.
     """
+
+    def __init__(self):
+        """
+        Try and initialize with Django settings.
+        """
+        try:
+            from django.conf import settings
+            for k, v in parser.defaults.items():
+                self[k] = getattr(settings, "GNOTTY_%s" % k, v)
+        except ImportError:
+            pass
+
+    def __getattr__(self, k):
+        return self[k]
 
     def parse_args(self):
         """
@@ -55,7 +69,7 @@ class Settings(dict):
             if option.dest:
                 file_value = file_settings.get("GNOTTY_%s" % option.dest, None)
                 # optparse doesn't seem to provide a way to determine if
-                # a setting's value was provided as a CLI arg, or if the
+                # an option's value was provided as a CLI arg, or if the
                 # default is being used, so we manually check sys.argv,
                 # since provided CLI args should take precedence over
                 # any settings defined in a conf module.
@@ -65,23 +79,6 @@ class Settings(dict):
                 else:
                     self[option.dest] = getattr(options, option.dest)
         self["STATIC_URL"] = "/static/"
-
-    def __getattr__(self, name):
-        if not self:
-            # First attribute access without settings loaded via
-            # ``parse_args`` - assume we're in the context of Django,
-            # so try and load settings from the settings module for the
-            # current Django project.
-            try:
-                from django.conf import settings
-                for k, v in parser.defaults.items():
-                    self[k] = getattr(settings, "GNOTTY_%s" % k, v)
-            except ImportError:
-                pass
-        try:
-            return self[name]
-        except KeyError:
-            raise AttributeError
 
 
 settings = Settings()
