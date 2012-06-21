@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 from __future__ import with_statement
 from gevent import monkey
@@ -135,3 +136,7 @@ def run():
     """
     settings.parse_args()
     serve_forever()
+
+
+if __name__ == "__main__":
+    run()
