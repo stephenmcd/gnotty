@@ -28,6 +28,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
     </a>
+    <a class="brand" href="{% url gnotty_chat %}">{{ IRC_CHANNEL }}</a>
     {% gnotty_nav %}
 </div>
 </div>
@@ -47,7 +48,7 @@
     <input type="button" class="btn hidden" id="leave" value="Leave">
 </div>
 </div>
-<p class="span3 powered">Powered by <a href="http://github.com/stephenmcd/gnotty">gnotty</a></p>
+<p class="span3 powered">Powered by <a href="{{ GNOTTY_PROJECT_URL }}">{{ GNOTTY_VERSION_STRING }}</a></p>
 </div>
 </form>
 </footer>

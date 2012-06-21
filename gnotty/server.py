@@ -11,7 +11,6 @@ from socketio import socketio_manage
 from socketio.server import SocketIOServer
 from socketio.namespace import BaseNamespace
 
-from gnotty import __version_string__
 from gnotty.client import WebSocketIRCClient
 from gnotty.conf import settings
 
@@ -40,7 +39,9 @@ class IRCNamespace(BaseNamespace):
         """
         WebSocket was disconnected - leave the IRC channel.
         """
-        self.client.connection.quit("bye")
+        quit_message = "%s %s" % (settings.GNOTTY_VERSION_STRING,
+                                  settings.GNOTTY_PROJECT_URL)
+        self.client.connection.quit(quit_message)
         super(IRCNamespace, self).disconnect(silent)
 
 
@@ -60,14 +61,13 @@ class IRCApplication(object):
             base = f.read()
         with open(os.path.join(template_dir, "chat.html"), "r") as f:
             base = base.replace("{% block content %}", f.read())
-        nav_title = "<a class=\"brand\" href=\"/\">{{ IRC_CHANNEL }}</a>"
         replace = {
             "{% block content %}": "",
             "{% endblock %}": "",
             "{% load gnotty_tags %}": "",
             "{% extends \"gnotty/base.html\" %}": "",
             "{% url gnotty_chat %}": "/",
-            "{% gnotty_nav %}": nav_title,
+            "{% gnotty_nav %}": "",
             "{% templatetag openvariable %}": "{{",
             "{% templatetag closevariable %}": "}}",
         }
@@ -114,7 +114,7 @@ class IRCApplication(object):
 
         start_response(status, [
             ("Content-Type", content_type),
-            ("Server", __version_string__)
+            ("Server", settings.GNOTTY_VERSION_STRING)
         ])
         return [data]
 
@@ -126,7 +126,8 @@ def serve_forever(socketio_only=False):
     host_port = (settings.HTTP_HOST, settings.HTTP_PORT)
     server = SocketIOServer(host_port, IRCApplication(socketio_only),
                             namespace="socket.io", policy_server=False)
-    print "%s listening on %s:%s" % ((__version_string__,) + host_port)
+    print "%s listening on %s:%s" % (
+          (settings.GNOTTY_VERSION_STRING,) + host_port)
     server.serve_forever()
 
 

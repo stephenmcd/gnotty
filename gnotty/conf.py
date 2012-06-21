@@ -3,10 +3,10 @@ from __future__ import with_statement
 from optparse import OptionParser
 import sys
 
-from gnotty import __version_string__
+from gnotty import __version__, __version_string__, __url__
 
 
-parser = OptionParser(usage="%prog [options]", version=__version_string__)
+parser = OptionParser(usage="%prog [options]", version=__version__)
 parser.add_option("-a", "--irc-host", dest="IRC_HOST", metavar="HOST",
                   default="irc.freenode.net",
                   help="IRC host address to connect to. [default: %default]")
@@ -43,6 +43,10 @@ class Settings(dict):
         """
         Try and initialize with Django settings.
         """
+        # Some constants about the software.
+        self["GNOTTY_VERSION"] = __version__
+        self["GNOTTY_VERSION_STRING"] = __version_string__
+        self["GNOTTY_PROJECT_URL"] = __url__
         try:
             from django.conf import settings
             for k, v in parser.defaults.items():

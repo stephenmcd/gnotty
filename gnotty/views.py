@@ -10,7 +10,8 @@ from gnotty.conf import settings
 
 
 def chat(request, template="gnotty/chat.html"):
-    return render(request, template, settings)
+    context = dict(settings)
+    return render(request, template, context)
 
 
 def messages(request, year=None, month=None, day=None,
@@ -30,7 +31,8 @@ def messages(request, year=None, month=None, day=None,
     else:
         return redirect("gnotty_year", year=datetime.now().year)
 
-    context = {"messages": messages}
+    context = dict(settings)
+    context["messages"] = messages
     return render(request, template, context)
 
 
@@ -46,8 +48,8 @@ def calendar(request, year=None, month=None, template="gnotty/calendar.html"):
     lookup = {"message_time__year": year}
     if month:
         lookup["message_time__month"] = month
-    days = [d.date() for d in
-            IRCMessage.objects.filter(**lookup).dates("message_time", "day")]
+    messages = IRCMessage.objects.filter(**lookup)
+    days = [d.date() for d in messages.dates("message_time", "day")]
     min_date, max_date = days[0], days[-1]
     days = set(days)
     months = []
@@ -67,5 +69,6 @@ def calendar(request, year=None, month=None, template="gnotty/calendar.html"):
                     }
             months.append({"month": date(year, m, 1), "weeks": weeks})
 
-    context = {"months": months}
+    context = dict(settings)
+    context["months"] = months
     return render(request, template, context)
