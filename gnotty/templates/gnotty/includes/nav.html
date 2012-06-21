@@ -1,4 +1,5 @@
 
+<a class="brand" href="{% url gnotty_chat %}">{{ IRC_CHANNEL }}</a>
 <div class="nav-collapse">
 <form action="{% url gnotty_search %}" class="navbar-search pull-right">
     <input class="search-query" required placeholder="Search" type="text" name="q" value="{{ request.GET.q }}">

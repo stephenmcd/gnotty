@@ -59,18 +59,20 @@ class IRCApplication(object):
             base = f.read()
         with open(os.path.join(template_dir, "chat.html"), "r") as f:
             base = base.replace("{% block content %}", f.read())
+        nav_title = "<a class=\"brand\" href=\"/\">{{ IRC_CHANNEL }}</a>"
         replace = {
             "{% block content %}": "",
             "{% endblock %}": "",
-            "{% gnotty_nav %}": "",
             "{% load gnotty_tags %}": "",
             "{% extends \"gnotty/base.html\" %}": "",
+            "{% url gnotty_chat %}": "/",
+            "{% gnotty_nav %}": nav_title,
             "{% templatetag openvariable %}": "{{",
             "{% templatetag closevariable %}": "}}",
         }
         for k, v in replace.items():
             base = base.replace(k, v)
-        for k, v in settings:
+        for k, v in settings.items():
             base = base.replace("{{ %s }}" % k, unicode(v or ""))
         return base
 

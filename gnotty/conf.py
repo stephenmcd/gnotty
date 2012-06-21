@@ -30,7 +30,7 @@ parser.add_option("-f", "--conf-file", dest="CONF_FILE", metavar="PATH",
                   help="Path to a Python config file to load options from.")
 
 
-class Settings(object):
+class Settings(dict):
     """
     Lazy-loaded settings object, backed by either Django settings,
     or CLI args. The ``--conf-file`` CLI arg can also be used to
@@ -38,10 +38,6 @@ class Settings(object):
     Implemented settings and their defaults are defined above by the
     ``OptionParser`` instance used for parsing CLI args.
     """
-
-    def __init__(self):
-        self._loaded = False
-        self._settings = {"STATIC_URL": "/static/"}
 
     def parse_args(self):
         """
@@ -65,30 +61,25 @@ class Settings(object):
                 # any settings defined in a conf module.
                 flags = option._short_opts + option._long_opts
                 if file_value and not set(flags) & set(sys.argv):
-                    self._settings[option.dest] = file_value
+                    self[option.dest] = file_value
                 else:
-                    self._settings[option.dest] = getattr(options, option.dest)
-        self._loaded = True
-
-    def __iter__(self):
-        return iter(self._settings)
+                    self[option.dest] = getattr(options, option.dest)
+        self["STATIC_URL"] = "/static/"
 
     def __getattr__(self, name):
-        if not self._loaded:
+        if not self:
             # First attribute access without settings loaded via
             # ``parse_args`` - assume we're in the context of Django,
             # so try and load settings from the settings module for the
             # current Django project.
-            self._loaded = True
-            self._settings.update(parser.defaults)
             try:
                 from django.conf import settings
-                for k, v in self._settings.items():
-                    self._settings[k] = getattr(settings, "GNOTTY_%s" % k, v)
+                for k, v in parser.defaults.items():
+                    self[k] = getattr(settings, "GNOTTY_%s" % k, v)
             except ImportError:
                 pass
         try:
-            return self._settings[name]
+            return self[name]
         except KeyError:
             raise AttributeError
 
