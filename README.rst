@@ -62,7 +62,7 @@ configuration module, specified via the command line.
   * ``GNOTTY_HTTP_PORT`` - HTTP port to serve from.
     *default: 8080*
   * ``GNOTTY_IRC_CHANNEL`` - IRC channel to join.
-    *default: #mezzanine*
+    *default: #gnotty*
   * ``GNOTTY_LOGGER_NICKNAME`` - IRC nickname the logging client will use.
     *default: gnotty*
 
@@ -168,7 +168,7 @@ structure of the chat template::
         httpPort:     '8080',
         ircHost:      'irc.freenode.net',
         ircPort:      '6667',
-        ircChannel:   '#mezzanine'
+        ircChannel:   '#gnotty'
     });
 
 The second interface is the ``IRCClient`` function. This is of
@@ -183,7 +183,7 @@ events out to the console::
         httpPort:     '8080',
         ircHost:      'irc.freenode.net',
         ircPort:      '6667',
-        ircChannel:   '#mezzanine',
+        ircChannel:   '#gnotty',
         ircNickname:  prompt('Enter a nickname:')
     });
 
