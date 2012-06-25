@@ -9,25 +9,25 @@ from gnotty import __version__, __version_string__, __url__
 parser = OptionParser(usage="%prog [options]", version=__version__)
 parser.add_option("-a", "--irc-host", dest="IRC_HOST", metavar="HOST",
                   default="irc.freenode.net",
-                  help="IRC host address to connect to. [default: %default]")
+                  help="IRC host address to connect to [default: %default]")
 parser.add_option("-p", "--irc-port", dest="IRC_PORT", metavar="PORT",
                   default=6667, type=int,
-                  help="IRC port to connect to. [default: %default]")
+                  help="IRC port to connect to [default: %default]")
 parser.add_option("-A", "--http-host", dest="HTTP_HOST", metavar="HOST",
                   default="127.0.0.1",
-                  help="HTTP host address to serve from. [default: %default]")
+                  help="HTTP host address to serve from [default: %default]")
 parser.add_option("-P", "--http-port", dest="HTTP_PORT", metavar="PORT",
                   default=8080, type=int,
-                  help="HTTP port to serve from. [default: %default]")
+                  help="HTTP port to serve from [default: %default]")
 parser.add_option("-c", "--irc-channel", dest="IRC_CHANNEL", metavar="CHANNEL",
-                  default="#mezzanine",
-                  help="IRC channel to join. [default: %default]")
+                  default="#gnotty",
+                  help="IRC channel to join [default: %default]")
 parser.add_option("-n", "--logger-nickname", dest="LOGGER_NICKNAME",
                   metavar="NICKNAME", default="gnotty",
-                  help="IRC nickname the logging client will use. "
+                  help="IRC nickname the logging client will use "
                        "[default: %default]")
 parser.add_option("-f", "--conf-file", dest="CONF_FILE", metavar="PATH",
-                  help="Path to a Python config file to load options from.")
+                  help="path to a Python config file to load options from")
 
 
 class Settings(dict):

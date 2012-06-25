@@ -109,7 +109,7 @@ matter of running the following Django management command::
 
     $ python manage.py run_gnotty
 
-Stand-alone Web Client
+Stand-Alone Web Client
 ======================
 
 As mentioned, Gnotty can also be run as a stand-alone web client
@@ -128,19 +128,19 @@ arguments to it::
       --version             show program's version number and exit
       -h, --help            show this help message and exit
       -a HOST, --irc-host=HOST
-                            IRC host address to connect to.
+                            IRC host address to connect to
       -p PORT, --irc-port=PORT
-                            IRC port to connect to.
+                            IRC port to connect to
       -A HOST, --http-host=HOST
-                            HTTP host address to serve from.
+                            HTTP host address to serve from
       -P PORT, --http-port=PORT
-                            HTTP port to serve from.
+                            HTTP port to serve from
       -c CHANNEL, --irc-channel=CHANNEL
-                            IRC channel to join.
+                            IRC channel to join
       -n NICKNAME, --logger-nickname=NICKNAME
-                            IRC nickname the logging client will use.
+                            IRC nickname the logging client will use
       -f PATH, --conf-file=PATH
-                            Path to a Python config file to load options from.
+                            path to a Python config file to load options from
 
 Note the final argument in the list, ``--conf-file``. This can be used
 to provide the path to a Python config module, that contains each of
