@@ -6,7 +6,8 @@ Created by `Stephen McDonald <http://twitter.com/stephen_mcd>`_
 
 Gnotty ties the knot between the web and IRC. It is designed to
 assist open source projects that host an IRC channel for collaboration
-on their project.
+on their project. Gnotty is
+`BSD licensed <http://www.linfo.org/bsdlicense.html>`_.
 
 Gnotty is comprised of two parts. The first part is a web client
 built with `gevent <http://www.gevent.org>`_ and
