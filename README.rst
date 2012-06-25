@@ -4,9 +4,9 @@ Gnotty
 
 Created by `Stephen McDonald <http://twitter.com/stephen_mcd>`_
 
-Gnotty ties the knot between the web and IRC. It is designed to
-assist open source projects that host an IRC channel for collaboration
-on their project. Gnotty is
+Gnotty ties the knot between the web and IRC. It is a web client and
+message archive for IRC, designed to assist open source projects that
+host an IRC channel for collaboration on their project. Gnotty is
 `BSD licensed <http://www.linfo.org/bsdlicense.html>`_.
 
 Gnotty is comprised of two parts. The first part is a web client
@@ -106,9 +106,9 @@ IRC bot that will connect to the channel, and log all of the messages
 in the channel to the database archive.
 
 Running the Gnotty server when integrated with Django is simply a
-matter of running the following Django management command::
+matter of running the ``gnottify`` Django management command::
 
-    $ python manage.py run_gnotty
+    $ python manage.py gnottify
 
 Stand-Alone Web Client
 ======================
@@ -118,11 +118,11 @@ without using Django at all. In this mode, only the web interface to
 the IRC channel is provided, and no message logging and search is
 available.
 
-Once installed, the command Gnotty should be available on your
+Once installed, the command ``gnottify`` should be available on your
 system, and all of the options described earlier can be provided as
 arguments to it::
 
-    $ gnotty --help
+    $ gnottify --help
     Usage: server.py [options]
 
     Options:
