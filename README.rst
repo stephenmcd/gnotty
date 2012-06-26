@@ -54,17 +54,21 @@ client, these same settings can be defined in a separate Python
 configuration module, specified via the command line.
 
   * ``GNOTYY_IRC_HOST`` - IRC host address to connect to.
-    *default: irc.freenode.net*
+    *string, default: irc.freenode.net*
   * ``GNOTTY_IRC_PORT`` - IRC port to connect to.
-    *default: 6667*
+    *integer, default: 6667*
   * ``GNOTTY_HTTP_HOST`` - HTTP host address to serve from.
-    *default: 127.0.0.1*
+    *string, default: 127.0.0.1*
   * ``GNOTTY_HTTP_PORT`` - HTTP port to serve from.
-    *default: 8080*
+    *integer, default: 8080*
   * ``GNOTTY_IRC_CHANNEL`` - IRC channel to join.
-    *default: #gnotty*
+    *string, default: #gnotty*
   * ``GNOTTY_LOGGER_NICKNAME`` - IRC nickname the logging client will use.
-    *default: gnotty*
+    *string, default: gnotty*
+  * ``GNOTTY_DAEMON`` - run in daemon mode.
+    *boolean, default: False*
+  * ``GNOTTY_PID_FILE`` - path to write PID file to when in daemon mode.
+    *string, default: [tmp]/gnotty-[http-host]-[http-port].pid*
 
 To be clear: the IRC host and port are for specifing the IRC server to
 connect to. The HTTP host and port are what will be used to host the
@@ -140,6 +144,9 @@ arguments to it::
                             IRC channel to join
       -n NICKNAME, --logger-nickname=NICKNAME
                             IRC nickname the logging client will use
+      -D, --daemon          run in daemon mode
+      -F PATH, --pid-file=PATH
+                            path to write PID file to when in daemon mode
       -f PATH, --conf-file=PATH
                             path to a Python config file to load options from
 
@@ -209,3 +216,18 @@ events out to the console::
 As you may have guessed, the server-side settings configured for Gnotty
 are passed directly into the ``gnotty`` JavaScript function, which then
 creates its own ``IRCClient`` instance.
+
+Daemon Mode
+===========
+
+Gnotty can be configured to run as a background process when the
+``GNOTTY_DAEMON`` setting is set to ``True`` (--daemon arg when running
+stand-alone). When in daemon mode, Gnotty will write its process ID to
+the absolute file path specfified by the ``GNOTTY_PID_FILE`` setting
+(--pid-file arg when running stand-alone). If the PID file path is not
+configured, Gnotty will use a file name based on the HTTP host and port,
+in your operating system's location for temporary files.
+
+When run in daemon mode, Gnotty will check for an existing PID file and
+if found, will attempt to shut down a previously started server with the
+same PID file.
