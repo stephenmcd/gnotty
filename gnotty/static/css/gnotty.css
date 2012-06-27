@@ -15,7 +15,7 @@ th {border-top:30px solid #fff !important;}
 .message-highlighted td {background:#ffc !important;}
 
 #nicknames {margin-bottom:0;}
-.nicknames-row {position:fixed; top:60px; bottom:90px; overflow-y:scroll;}
+.nicknames-row {position:fixed; top:60px; bottom:90px; overflow-y:scroll; z-index:-1;}
 .nicknames-wrap {margin-left:-50px;}
 
 .dropdown-menu a {text-align:right;}
