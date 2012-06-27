@@ -1,5 +1,5 @@
 
-from irclib import SimpleIRCClient
+from gnotty.lib.irclib import SimpleIRCClient
 
 
 class BaseIRCClient(SimpleIRCClient):
