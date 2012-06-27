@@ -116,6 +116,8 @@ var gnotty = function(options) {
             }).join(':')
             data.color = color(data.nickname);
 
+            data.message = urlize($('<div>').text(data.message).html());
+
             // Auto-scroll the window if we're at the bottom of the
             // messages list. We need to calculate it before we add
             // actual message to the list.

@@ -11,6 +11,7 @@ th {border-top:30px solid #fff !important;}
 
 .message {width:100%;}
 #messages td, .nickname {font-family:Menlo,Monaco,'Courier New',monospace; border:0;}
+#messages a {text-decoration:underline;}
 .message-highlighted td {background:#ffc !important;}
 
 #nicknames {margin-bottom:0;}
