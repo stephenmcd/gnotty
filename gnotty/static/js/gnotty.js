@@ -61,6 +61,10 @@ var IRCClient = function(options) {
 // UI setup.
 var gnotty = function(options) {
 
+    var focused = true;
+    var unread = 0;
+    var title = $('title').text();
+
     // Assign a dark colour to each nickname.
     var colors = {};
     var color = function(nickname) {
@@ -101,17 +105,36 @@ var gnotty = function(options) {
             $('#nicknames').html($('#nicknames-template').tmpl(data));
         };
 
-        // Add a timestamp to each message as we receive it, and
-        // add it to the messages display. Also scroll the window.
         client.onMessage = function(data) {
+
+            // Add a timestamp to each message as we receive it, and
+            // add it to the messages display.
             var d = new Date();
             var parts = [d.getHours(), d.getMinutes(), d.getSeconds()];
             data.time = $.map(parts, function(s) {
                 return (String(s).length == 1 ? '0' : '') + s;
             }).join(':')
             data.color = color(data.nickname);
+
+            // Auto-scroll the window if we're at the bottom of the
+            // messages list. We need to calculate it before we add
+            // actual message to the list.
+            var win = $(window);
+            var doc = $(window.document);
+            var bottom = win.scrollTop() + win.height() >= doc.height();
             $('#messages-template').tmpl(data).appendTo('#messages');
-            window.scrollBy(0, 10000);
+            if (bottom) {
+                window.scrollBy(0, 10000);
+            }
+
+            // Add the number of unread messages to the title if the
+            // page isn't focused.
+            if (!focused) {
+                unread += 1;
+                var s = (unread == 1 ? '' : 's');
+                $('title').text('(' + unread + ' message' + s + ') ' + title);
+            }
+
         };
 
     };
@@ -144,6 +167,16 @@ var gnotty = function(options) {
     if (parts.length == 2) {
         start(parts[1].split('&')[0]);
     }
+
+    $(window).focus(function() {
+        focused = true;
+        $('title').text(title);
+    });
+
+    $(window).blur(function() {
+        unread = 0;
+        focused = false;
+    });
 
     $('#input').val('').focus();
 
