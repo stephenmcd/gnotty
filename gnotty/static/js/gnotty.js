@@ -30,7 +30,8 @@ var IRCClient = function(options) {
         self[k] = options[k];
     }
 
-    var socket = io.connect(options.httpHost + ':' + options.httpPort)
+    var host = options.httpHost == '0.0.0.0' ? '' : options.httpHost;
+    var socket = io.connect(host + ':' + options.httpPort);
 
     self.message = function(message) {
         socket.emit('message', message);
