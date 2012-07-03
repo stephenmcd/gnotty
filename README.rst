@@ -194,10 +194,10 @@ events out to the console::
         ircNickname:  prompt('Enter a nickname:')
     });
 
-    // When the client is first connected to the IRC channel,
+    // When the client first joins the IRC channel,
     // send a message to the channel to say hello.
-    client.onConnect = function() {
-        console.log('connected');
+    client.onJoin = function() {
+        console.log('joined the channel');
         client.message('Hello, is it me you\'re looking for?');
     };
 

@@ -40,8 +40,11 @@ var IRCClient = function(options) {
     socket.on('connect', function() {
         socket.emit('start', options.ircHost, options.ircPort,
                              options.ircChannel, options.ircNickname);
-        if (self.onConnect) {
-            self.onConnect();
+    });
+
+    socket.on('join', function() {
+        if (self.onJoin) {
+            self.onJoin();
         }
     });
 
@@ -87,7 +90,7 @@ var gnotty = function(options) {
 
         // Once connected, show the 'leaves' button, user list,
         // and change the submit text to 'Send' for sending messages.
-        client.onConnect = function() {
+        client.onJoin = function() {
             $('#input').animate({width: '65%'}, function() {
                 $('#input').attr('placeholder', 'message');
                 $('.hidden').slideDown(function() {
