@@ -66,6 +66,7 @@ var IRCClient = function(options) {
 var gnotty = function(options) {
 
     var focused = true;
+    var joining = false;
     var unread = 0;
     var title = $('title').text();
 
@@ -87,10 +88,18 @@ var gnotty = function(options) {
 
         options.ircNickname = nickname;
         client = new IRCClient(options);
+        joining = true;
+        setTimeout(function() {
+            if (joining) {
+                alert('Took too long to connect, please try again');
+            }
+            joining = false;
+        }, 10000);
 
         // Once connected, show the 'leaves' button, user list,
         // and change the submit text to 'Send' for sending messages.
         client.onJoin = function() {
+            joining = false;
             $('#input').animate({width: '65%'}, function() {
                 $('#input').attr('placeholder', 'message');
                 $('.hidden').slideDown(function() {
@@ -151,7 +160,7 @@ var gnotty = function(options) {
     // submitted is a message.
     $('.chat').submit(function() {
         var value = $('#input').val();
-        if (value) {
+        if (!joining && value) {
             if ($('.hidden').length > 0) {
                 start(value);
             } else {

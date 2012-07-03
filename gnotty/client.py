@@ -112,8 +112,7 @@ class WebSocketIRCClient(BaseIRCClient):
         Someone joined the channel - send the nicknames list to the
         WebSocket.
         """
-        # from time import sleep
-        # sleep(10)  # Simulate a slow connection
+        #from time import sleep; sleep(10)  # Simulate a slow connection
         nickname = self.get_nickname(event)
         self.nicknames.add(nickname)
         self.namespace.emit("join")
