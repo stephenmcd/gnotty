@@ -113,7 +113,7 @@ var gnotty = function(options) {
                     $('#input').animate({width: '65%'}, function() {
                         $('#input').attr('placeholder', 'message');
                         $('.hidden').slideDown(function() {
-                            $('#submit').val('Send');
+                            $('#submit').addClass('submit-joined').val('Send');
                             $('#messages').fadeIn();
                         }).removeClass('hidden');
                     });
