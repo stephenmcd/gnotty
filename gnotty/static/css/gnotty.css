@@ -10,6 +10,7 @@ th {border-top:30px solid #fff !important;}
 .calendar a {font-weight:bold; text-decoration:underline;}
 
 .message {width:100%;}
+#messages {display:none;}
 #messages td, .nickname {font-family:Menlo,Monaco,'Courier New',monospace; border:0;}
 #messages a {text-decoration:underline;}
 .message-highlighted td {background:#ffc !important;}
@@ -22,6 +23,11 @@ th {border-top:30px solid #fff !important;}
 .chat {margin-top:5px; margin-bottom:0; padding:15px 0;}
 .chat input {margin-right:10px;}
 .hidden {display: none;}
+
+.loading {margin-top:0; top:40%;}
+.progress {margin-bottom:0;}
+.bar {width:1px;}
+.modal-backdrop {background:#fff;}
 
 .powered {padding:10px 0;}
 

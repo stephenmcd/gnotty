@@ -86,26 +86,39 @@ var gnotty = function(options) {
     // Creates IRC client and sets up event handlers.
     var start = function(nickname) {
 
+        joining = true;
         options.ircNickname = nickname;
         client = new IRCClient(options);
-        joining = true;
-        setTimeout(function() {
-            if (joining) {
-                alert('Took too long to connect, please try again');
-            }
-            joining = false;
+
+        $('.loading').modal({backdrop: 'static'}).css({opacity: 0.7});
+        var bar = $('.loading .bar');
+        var width = $('.loading .progress').css({opacity: 0.5}).width();
+        $('.loading .bar').animate({width: width}, 15000);
+
+        var timeout = setTimeout(function() {
+            alert('Took too long to connect, please try again');
+            location.reload();
         }, 10000);
 
-        // Once connected, show the 'leaves' button, user list,
-        // and change the submit text to 'Send' for sending messages.
-        client.onJoin = function() {
+        // Clear the joining progress bar and join timeout. If joining
+        // was successfull, finish the progress animation off first.
+        client.onJoin = function(timedOut) {
             joining = false;
-            $('#input').animate({width: '65%'}, function() {
-                $('#input').attr('placeholder', 'message');
-                $('.hidden').slideDown(function() {
-                    $('#submit').val('Send');
-                }).removeClass('hidden');
-            });
+            bar.stop().animate({width: width}, 500);
+            clearTimeout(timeout);
+            var interval = setInterval(function() {
+                if (bar.width() == width) {
+                    clearInterval(interval);
+                    $('.loading').modal('hide');
+                    $('#input').animate({width: '65%'}, function() {
+                        $('#input').attr('placeholder', 'message');
+                        $('.hidden').slideDown(function() {
+                            $('#submit').val('Send');
+                            $('#messages').fadeIn();
+                        }).removeClass('hidden');
+                    });
+                }
+            }, 100);
         };
 
         // Render the nickanmes list each time we receive it,
