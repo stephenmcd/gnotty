@@ -16,6 +16,7 @@ that should include the following members:
 The follwing methods are implemented:
 
     - message(message):         Sends a message string to the channel
+    - leave():                  Disconnect from the channel
     - onConnect():              Called when the client has joined the channel
     - onNickNames(nicknames):   Called each time someone joins or leaves the
                                 channel, nicknames is an unsorted array of
@@ -23,6 +24,7 @@ The follwing methods are implemented:
     - onMessage(message):       Called when a message is received from the
                                 channel, message is an object with nickname
                                 and message string members.
+    - onLeave():                Called when client.leave() has completed
 
 */
 var IRCClient = function(options) {
@@ -41,6 +43,14 @@ var IRCClient = function(options) {
 
     self.leave = function() {
         self.socket.disconnect();
+        if (self.onLeave) {
+            var interval = setInterval(function() {
+                if (!self.socket.socket.connected) {
+                    clearInterval(interval);
+                    self.onLeave();
+                }
+            }, 100);
+        }
     };
 
     self.socket.on('connect', function() {
@@ -171,6 +181,11 @@ var gnotty = function(options) {
 
         };
 
+        // Leaves just reloads.
+        client.onLeave = function() {
+            location = location.href.split('?')[0];
+        };
+
     };
 
     // Main submit handler - if there are still hidden elements,
@@ -190,12 +205,7 @@ var gnotty = function(options) {
         return false;
     });
 
-    // Leaves just reloads - this will trigger a disconnect for
-    // the client.
-    $('#leave').click(function() {
-        client.leave();
-        location = location.href.split('?')[0];
-    });
+    $('#leave').click(client.leave);
 
     // Join if there's a nickname in the querystring.
     var parts = location.href.split('?nickname=');

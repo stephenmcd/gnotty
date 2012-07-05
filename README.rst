@@ -214,6 +214,12 @@ events out to the console::
         console.log(data.nickname + ' wrote: ' + data.message);
     });
 
+    // When we leave, reload the page.
+    client.onLeave = function() {
+        location.reload();
+    };
+
+
 As you may have guessed, the server-side settings configured for Gnotty
 are passed directly into the ``gnotty`` JavaScript function, which then
 creates its own ``IRCClient`` instance.
