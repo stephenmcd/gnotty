@@ -127,7 +127,7 @@ def serve_forever(socketio_only=False):
     """
     host_port = (settings.HTTP_HOST, settings.HTTP_PORT)
     server = SocketIOServer(host_port, IRCApplication(socketio_only),
-                            namespace="socket.io", policy_server=False)
+                            namespace="socket.io")
     print "%s listening on %s:%s" % (
           (settings.GNOTTY_VERSION_STRING,) + host_port)
     server.serve_forever()
