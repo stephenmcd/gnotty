@@ -133,20 +133,33 @@ def serve_forever(socketio_only=False):
     server.serve_forever()
 
 
+def kill(pid_file):
+    """
+    Attempts to shut down a previously started daemon.
+    """
+    try:
+        with open(pid_file) as f:
+            os.kill(int(f.read()), 9)
+        os.remove(pid_file)
+    except (IOError, OSError):
+        return False
+    return True
+
 def run():
     """
     CLI entry point. Parses args and starts the gevent-socketio server.
     """
     settings.parse_args()
+    pid_file = settings.PID_FILE or os.path.join(gettempdir(),
+        "gnotty-%s-%s.pid" % (settings.HTTP_HOST, settings.HTTP_PORT))
+    if settings.KILL:
+        if kill(pid_file):
+            print "Daemon killed"
+        else:
+            print "Could not kill any daemons"
+        return
     if settings.DAEMON:
-        pid_file = settings.PID_FILE or os.path.join(gettempdir(),
-            "gnotty-%s-%s.pid" % (settings.HTTP_HOST, settings.HTTP_PORT))
-        try:
-            with open(pid_file) as f:
-                os.kill(int(f.read()), 9)
-            os.remove(pid_file)
-        except (IOError, OSError):
-            pass
+        kill(pid_file)
         daemonize(pid_file)
     serve_forever()
 

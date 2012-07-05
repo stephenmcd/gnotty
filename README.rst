@@ -145,6 +145,7 @@ arguments to it::
       -n NICKNAME, --logger-nickname=NICKNAME
                             IRC nickname the logging client will use
       -D, --daemon          run in daemon mode
+      -k, --kill            Shuts down a previously started daemon
       -F PATH, --pid-file=PATH
                             path to write PID file to when in daemon mode
       -f PATH, --conf-file=PATH

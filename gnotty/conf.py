@@ -29,6 +29,9 @@ parser.add_option("-n", "--logger-nickname", dest="LOGGER_NICKNAME",
 parser.add_option("-D", "--daemon", dest="DAEMON", action="store_true",
                   default=False,
                   help="run in daemon mode")
+parser.add_option("-k", "--kill", dest="KILL", action="store_true",
+                  default=False,
+                  help="Shuts down a previously started daemon")
 parser.add_option("-F", "--pid-file", dest="PID_FILE", metavar="PATH",
                   help="path to write PID file to when in daemon mode")
 parser.add_option("-f", "--conf-file", dest="CONF_FILE", metavar="PATH",
