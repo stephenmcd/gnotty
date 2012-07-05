@@ -1,4 +1,6 @@
 
+WEB_SOCKET_SWF_LOCATION = '/static/WebSocketMain.swf';
+
 /*
 
 Manages a connection to an IRC room - takes an options objects
@@ -98,7 +100,7 @@ var gnotty = function(options) {
         var timeout = setTimeout(function() {
             alert('Took too long to connect, please try again');
             location.reload();
-        }, 10000);
+        }, 20000);
 
         // Clear the joining progress bar and join timeout. If joining
         // was successfull, finish the progress animation off first.
