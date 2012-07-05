@@ -33,30 +33,30 @@ var IRCClient = function(options) {
     }
 
     var host = options.httpHost == '0.0.0.0' ? '' : options.httpHost;
-    var socket = io.connect(host + ':' + options.httpPort);
+    self.socket = io.connect(host + ':' + options.httpPort);
 
     self.message = function(message) {
-        socket.emit('message', message);
+        self.socket.emit('message', message);
     };
 
-    socket.on('connect', function() {
-        socket.emit('start', options.ircHost, options.ircPort,
-                             options.ircChannel, options.ircNickname);
+    self.socket.on('connect', function() {
+        self.socket.emit('start', options.ircHost, options.ircPort,
+                                  options.ircChannel, options.ircNickname);
     });
 
-    socket.on('join', function() {
+    self.socket.on('join', function() {
         if (self.onJoin) {
             self.onJoin();
         }
     });
 
-    socket.on('nicknames', function(nicknames) {
+    self.socket.on('nicknames', function(nicknames) {
         if (self.onNicknames) {
             self.onNicknames(nicknames);
         }
     });
 
-    socket.on('message', function(nickname, message) {
+    self.socket.on('message', function(nickname, message) {
         if (self.onMessage) {
             self.onMessage({nickname: nickname, message: message});
         }
