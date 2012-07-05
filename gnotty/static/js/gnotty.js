@@ -39,6 +39,10 @@ var IRCClient = function(options) {
         self.socket.emit('message', message);
     };
 
+    self.leave = function() {
+        self.socket.disconnect();
+    };
+
     self.socket.on('connect', function() {
         self.socket.emit('start', options.ircHost, options.ircPort,
                                   options.ircChannel, options.ircNickname);
@@ -189,6 +193,7 @@ var gnotty = function(options) {
     // Leaves just reloads - this will trigger a disconnect for
     // the client.
     $('#leave').click(function() {
+        client.leave();
         location = location.href.split('?')[0];
     });
 
