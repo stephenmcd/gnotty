@@ -185,6 +185,7 @@ var gnotty = function(options) {
         client.onLeave = function() {
             location = location.href.split('?')[0];
         };
+        $('#leave').click(client.leave);
 
     };
 
@@ -204,8 +205,6 @@ var gnotty = function(options) {
         $('#input').val('').focus();
         return false;
     });
-
-    $('#leave').click(client.leave);
 
     // Join if there's a nickname in the querystring.
     var parts = location.href.split('?nickname=');
