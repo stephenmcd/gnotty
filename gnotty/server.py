@@ -158,9 +158,9 @@ def run():
         else:
             print "Could not kill any daemons"
         return
+    if kill(pid_file):
+        print "Running daemon killed"
     if settings.DAEMON:
-        if kill(pid_file):
-            print "Running daemon killed"
         daemonize(pid_file)
     serve_forever()
 
