@@ -185,7 +185,9 @@ var gnotty = function(options) {
         client.onLeave = function() {
             location = location.href.split('?')[0];
         };
-        $('#leave').click(client.leave);
+        $('#leave').click(function() {
+            $('body').fadeOut('fast', client.leave);
+        });
 
     };
 
