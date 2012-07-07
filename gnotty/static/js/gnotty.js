@@ -1,5 +1,5 @@
 
-WEB_SOCKET_SWF_LOCATION = '/static/WebSocketMain.swf';
+WEB_SOCKET_SWF_LOCATION = '/static/swf/WebSocketMain.swf';
 
 /*
 
