@@ -37,14 +37,14 @@ class IRCNamespace(BaseNamespace):
         if hasattr(self, "client"):
             self.client.emit_message(message)
 
-    def disconnect(self, silent=False):
+    def recv_disconnect(self):
         """
         WebSocket was disconnected - leave the IRC channel.
         """
         quit_message = "%s %s" % (settings.GNOTTY_VERSION_STRING,
                                   settings.GNOTTY_PROJECT_URL)
         self.client.connection.quit(quit_message)
-        super(IRCNamespace, self).disconnect(silent)
+        self.disconnect(silent=True)
 
 
 class IRCApplication(object):
