@@ -13,7 +13,7 @@ register = template.Library()
 def gnotty_nav(context):
     min_max = IRCMessage.objects.aggregate(Min("message_time"),
                                            Max("message_time"))
-    if min_max:
+    if min_max.values()[0]:
         years = range(min_max["message_time__max"].year,
                       min_max["message_time__min"].year - 1, -1)
     else:
