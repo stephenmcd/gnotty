@@ -53,7 +53,7 @@ with Django, these settings can be defined in your Django project's
 client, these same settings can be defined in a separate Python
 configuration module, specified via the command line.
 
-  * ``GNOTYY_IRC_HOST`` - IRC host address to connect to.
+  * ``GNOTTY_IRC_HOST`` - IRC host address to connect to.
     *string, default: irc.freenode.net*
   * ``GNOTTY_IRC_PORT`` - IRC port to connect to.
     *integer, default: 6667*
