@@ -17,7 +17,9 @@ The follwing methods are implemented:
 
     - message(message):         Sends a message string to the channel
     - leave():                  Disconnect from the channel
-    - onConnect():              Called when the client has joined the channel
+    - onJoin():                 Called when the client has joined the channel
+    - onInvalid():              Called if the nickname used is invalid, eg:
+                                too long, or contains invalid characters.
     - onNickNames(nicknames):   Called each time someone joins or leaves the
                                 channel, nicknames is an unsorted array of
                                 strings.
@@ -114,45 +116,69 @@ var gnotty = function(options) {
     // Creates IRC client and sets up event handlers.
     var start = function(nickname) {
 
+        // Start the IRC client.
         joining = true;
         options.ircNickname = nickname;
         client = new IRCClient(options);
 
+        // Set up the loading animation.
         $('.loading').modal({backdrop: 'static'}).css({opacity: 0.7});
         var bar = $('.loading .bar');
         var width = $('.loading .progress').css({opacity: 0.5}).width();
-        $('.loading .bar').animate({width: width}, 15000);
+        var connectTimeout = 30000;
+        $('.loading .bar').animate({width: width}, connectTimeout / 2);
 
-        var error = function(message) {
-            alert(message);
-            location.reload();
+        // Fade the page out and reload it whenever we're finished,
+        // such as an error occurring, or explicitly leaving.
+        client.onLeave = function() {
+            $('body').fadeOut('fast', function() {
+                location = location.href.split('?')[0];
+            });
         };
 
+        // Error handler - shows an error message, and leaves.
+        var error = function(message) {
+            if (message) {
+                alert(message);
+            }
+            client.leave();
+        };
+
+        // Took too long to connect.
         var timeout = setTimeout(function() {
             error('Took too long to connect, please try again');
-        }, 20000);
+        }, connectTimeout);
 
+        // Name in use, too long, invalid chars.
         client.onInvalid = function() {
             error('Invalid nickname, please try again');
         };
 
-        // Clear the joining progress bar and join timeout. If joining
-        // was successfull, finish the progress animation off first.
-        client.onJoin = function(timedOut) {
+        // Animations for setting up the main chat interface
+        // once successfully joined.
+        var joined = function() {
+            $('.loading').modal('hide');
+            $('#input').animate({width: '65%'}, function() {
+                $('#input').attr('placeholder', 'message');
+                $('.hidden').slideDown(function() {
+                    $('#submit').addClass('submit-joined').val('Send');
+                    $('#messages').fadeIn();
+                }).removeClass('hidden');
+            });
+            $('#leave').click(function() {
+                client.leave();
+            });
+        }
+
+        // On join, finish the progress animation.
+        client.onJoin = function() {
             joining = false;
             bar.stop().animate({width: width}, 500);
             clearTimeout(timeout);
             var interval = setInterval(function() {
                 if (bar.width() == width) {
                     clearInterval(interval);
-                    $('.loading').modal('hide');
-                    $('#input').animate({width: '65%'}, function() {
-                        $('#input').attr('placeholder', 'message');
-                        $('.hidden').slideDown(function() {
-                            $('#submit').addClass('submit-joined').val('Send');
-                            $('#messages').fadeIn();
-                        }).removeClass('hidden');
-                    });
+                    joined();
                 }
             }, 100);
         };
@@ -167,6 +193,7 @@ var gnotty = function(options) {
             $('#nicknames').html($('#nicknames-template').tmpl(data));
         };
 
+        // Message received handler.
         client.onMessage = function(data) {
 
             // Add a timestamp to each message as we receive it, and
@@ -201,14 +228,6 @@ var gnotty = function(options) {
 
         };
 
-        // Leaves just reloads.
-        client.onLeave = function() {
-            location = location.href.split('?')[0];
-        };
-        $('#leave').click(function() {
-            $('body').fadeOut('fast', client.leave);
-        });
-
     };
 
     // Main submit handler - if there are still hidden elements,
@@ -234,16 +253,20 @@ var gnotty = function(options) {
         start(parts[1].split('&')[0]);
     }
 
-    $(window).focus(function() {
-        focused = true;
-        $('title').text(title);
-    });
-
+    // When the window loses focus, reset the unread messages count.
     $(window).blur(function() {
         unread = 0;
         focused = false;
     });
 
+    // When the window regains focus, remove the unread messages
+    // count from the page title.
+    $(window).focus(function() {
+        focused = true;
+        $('title').text(title);
+    });
+
+    // Focus the main input box on first load.
     $('#input').val('').focus();
 
 };
