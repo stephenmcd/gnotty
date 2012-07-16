@@ -12,10 +12,10 @@ th {border-top:30px solid #fff !important;}
 .calendar .not-in-month {color:#ddd;}
 .calendar a {font-weight:bold; text-decoration:underline;}
 
+.main-chat {display:none;}
+.main-chat a {text-decoration:underline;}
 .message {width:100%;}
-#messages {display:none;}
 #messages td, .nickname {font-family:Menlo,Monaco,'Courier New',monospace; border:0;}
-#messages a {text-decoration:underline;}
 .message-highlighted td {background:#ffc !important;}
 
 #nicknames {margin-bottom:0;}
@@ -35,7 +35,7 @@ th {border-top:30px solid #fff !important;}
 .powered {padding:10px 0; margin:0 10px; text-align:right;}
 
 @media (max-width: 767px) {
-    body {margin-top:20px;}
+    body {margin-top:0;}
     #input {max-width:55%;}
-    .navbar, .submit-joined, .powered {display:none !important;}
+    .navbar-fixed-top, .submit-joined, .powered {display:none !important;}
 }
