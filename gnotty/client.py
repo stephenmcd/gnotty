@@ -98,6 +98,12 @@ class WebSocketIRCClient(BaseIRCClient):
         """
         self.namespace.emit("nicknames", list(self.nicknames))
 
+    def on_erroneusnickname(self, connection, event):
+        """
+        Invalid nickname chars/length - report back to the client.
+        """
+        self.namespace.emit("invalid")
+
     def on_namreply(self, connection, event):
         """
         Initial list of nicknames received - remove op/voice prefixes,

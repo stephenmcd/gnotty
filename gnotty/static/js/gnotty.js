@@ -67,6 +67,15 @@ var IRCClient = function(options) {
         }
     });
 
+    self.socket.on('invalid', function() {
+        self.socket.disconnect();
+        if (self.onInvalid) {
+            self.onInvalid();
+        } else {
+            alert('Invalid nickname');
+        }
+    });
+
     self.socket.on('nicknames', function(nicknames) {
         if (self.onNicknames) {
             self.onNicknames(nicknames);
@@ -114,10 +123,18 @@ var gnotty = function(options) {
         var width = $('.loading .progress').css({opacity: 0.5}).width();
         $('.loading .bar').animate({width: width}, 15000);
 
-        var timeout = setTimeout(function() {
-            alert('Took too long to connect, please try again');
+        var error = function(message) {
+            alert(message);
             location.reload();
+        };
+
+        var timeout = setTimeout(function() {
+            error('Took too long to connect, please try again');
         }, 20000);
+
+        client.onInvalid = function() {
+            error('Invalid nickname, please try again');
+        };
 
         // Clear the joining progress bar and join timeout. If joining
         // was successfull, finish the progress animation off first.

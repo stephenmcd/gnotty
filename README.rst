@@ -219,6 +219,11 @@ events out to the console::
         location.reload();
     };
 
+    // The IRC server rejected the nickname.
+    client.onInvalid = function() {
+        console.log('Invalid nickname, please try again.');
+    };
+
 
 As you may have guessed, the server-side settings configured for Gnotty
 are passed directly into the ``gnotty`` JavaScript function, which then
