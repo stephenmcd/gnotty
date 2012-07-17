@@ -59,8 +59,13 @@ class Settings(dict):
             from django.conf import settings
             for k, v in parser.defaults.items():
                 self[k] = getattr(settings, "GNOTTY_%s" % k, v)
+            self.set_max_message_length()
         except ImportError:
             pass
+
+    def set_max_message_length(self):
+        extra_message_chars = "#PRIVMSG %s :\r\n" % self["IRC_CHANNEL"]
+        self["MAX_MESSAGE_LENGTH"] = 512 - len(extra_message_chars)
 
     def __getattr__(self, k):
         return self[k]
@@ -90,6 +95,7 @@ class Settings(dict):
                     self[option.dest] = file_value
                 else:
                     self[option.dest] = getattr(options, option.dest)
+        self.set_max_message_length()
         self["STATIC_URL"] = "/static/"
 
 

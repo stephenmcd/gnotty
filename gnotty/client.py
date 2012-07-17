@@ -1,4 +1,5 @@
 
+from gnotty.conf import settings
 from gnotty.lib.irclib import SimpleIRCClient
 
 
@@ -88,6 +89,7 @@ class WebSocketIRCClient(BaseIRCClient):
         back to the sender's WebSocket.
         """
         if self.nickname in self.nicknames:
+            message = message[:settings.MAX_MESSAGE_LENGTH]
             self.connection.privmsg(self.channel, message)
             self.namespace.emit("message", self.nickname, message)
 

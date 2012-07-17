@@ -1,6 +1,5 @@
 * Multiple channels
 * Tests
 * Configurable logger/bot class
-* Handle message lengths
 * IRC passwords
 * Redirect to port 80 if Django client accessed
