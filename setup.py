@@ -1,7 +1,7 @@
 
 from setuptools import setup, find_packages
 
-from gnotty import __version__
+from gnotty import __version__, __url__
 
 
 setup(
@@ -13,7 +13,7 @@ setup(
                 "client and message archive for IRC.",
     long_description=open("README.rst").read(),
     license="BSD",
-    url="http://gnotty.jupo.org/",
+    url=__url__,
     zip_safe=False,
     include_package_data=True,
     packages=find_packages(),

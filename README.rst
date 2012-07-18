@@ -63,7 +63,10 @@ configuration module, specified via the command line.
     *integer, default: 8080*
   * ``GNOTTY_IRC_CHANNEL`` - IRC channel to join.
     *string, default: #gnotty*
-  * ``GNOTTY_LOGGER_NICKNAME`` - IRC nickname the logging client will use.
+  * ``GNOTTY_BOT_CLASS`` - Dotted Python path to the IRC client bot
+    class to run.
+    *string, default: gnotty.bots.ModelLogginBot*
+  * ``GNOTTY_BOT_NICKNAME`` - IRC nickname the logging client will use.
     *string, default: gnotty*
   * ``GNOTTY_DAEMON`` - run in daemon mode.
     *boolean, default: False*
@@ -127,28 +130,37 @@ system, and all of the options described earlier can be provided as
 arguments to it::
 
     $ gnottify --help
-    Usage: server.py [options]
+    Usage: gnottify [options]
 
     Options:
       --version             show program's version number and exit
       -h, --help            show this help message and exit
-      -a HOST, --irc-host=HOST
+      -A HOST, --irc-host=HOST
                             IRC host address to connect to
-      -p PORT, --irc-port=PORT
+                            [default: irc.freenode.net]
+      -P PORT, --irc-port=PORT
                             IRC port to connect to
-      -A HOST, --http-host=HOST
+                            [default: 6667]
+      -a HOST, --http-host=HOST
                             HTTP host address to serve from
-      -P PORT, --http-port=PORT
+                            [default: 127.0.0.1]
+      -p PORT, --http-port=PORT
                             HTTP port to serve from
-      -c CHANNEL, --irc-channel=CHANNEL
+                            [default: 8080]
+      -C CHANNEL, --irc-channel=CHANNEL
                             IRC channel to join
-      -n NICKNAME, --logger-nickname=NICKNAME
-                            IRC nickname the logging client will use
+                            [default: #gnotty]
+      -c DOTTED_PYTHON_PATH, --bot-class=DOTTED_PYTHON_PATH
+                            Dotted Python path to the IRC client bot class to run
+                            [default: gnotty.bots.LoggingBot]
+      -n NICKNAME, --bot-nickname=NICKNAME
+                            IRC nickname the bot will use
+                            [default: gnotty]
       -D, --daemon          run in daemon mode
       -k, --kill            Shuts down a previously started daemon
-      -F PATH, --pid-file=PATH
+      -F FILE_PATH, --pid-file=FILE_PATH
                             path to write PID file to when in daemon mode
-      -f PATH, --conf-file=PATH
+      -f FILE_PATH, --conf-file=FILE_PATH
                             path to a Python config file to load options from
 
 Note the final argument in the list, ``--conf-file``. This can be used

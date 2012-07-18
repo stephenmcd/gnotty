@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 from __future__ import with_statement
-from gevent import monkey
+from gevent import monkey, spawn
 monkey.patch_all()
 
 import os
+import sys
 from tempfile import gettempdir
 from mimetypes import guess_type
 
@@ -121,10 +122,21 @@ class IRCApplication(object):
         return [data]
 
 
+def _import(class_path):
+    module, attr = class_path.rsplit(".", 1)
+    __import__(module)
+    return getattr(sys.modules[module], attr)
+
+
 def serve_forever(socketio_only=False):
     """
     Starts the gevent-socketio server.
     """
+    if settings.BOT_CLASS:
+        bot_class = _import(settings.BOT_CLASS)
+        bot = bot_class(settings.IRC_HOST, settings.IRC_PORT,
+                        settings.IRC_CHANNEL, settings.BOT_NICKNAME)
+        spawn(bot.start)
     host_port = (settings.HTTP_HOST, settings.HTTP_PORT)
     server = SocketIOServer(host_port, IRCApplication(socketio_only),
                             resource="socket.io", policy_server=False)
