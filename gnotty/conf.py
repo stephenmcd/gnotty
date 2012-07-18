@@ -1,45 +1,47 @@
 
 from __future__ import with_statement
-from optparse import OptionParser
+from optparse import OptionParser, OptionGroup
 import sys
 
 from gnotty import __version__, __version_string__, __url__
 
 
 parser = OptionParser(usage="%prog [options]", version=__version__)
-parser.add_option("-A", "--irc-host", dest="IRC_HOST", metavar="HOST",
+options = OptionGroup(parser, "")
+options.add_option("-A", "--irc-host", dest="IRC_HOST", metavar="HOST",
                   default="irc.freenode.net",
                   help="IRC host address to connect to [default: %default]")
-parser.add_option("-P", "--irc-port", dest="IRC_PORT", metavar="PORT",
+options.add_option("-P", "--irc-port", dest="IRC_PORT", metavar="PORT",
                   default=6667, type=int,
                   help="IRC port to connect to [default: %default]")
-parser.add_option("-a", "--http-host", dest="HTTP_HOST", metavar="HOST",
+options.add_option("-a", "--http-host", dest="HTTP_HOST", metavar="HOST",
                   default="127.0.0.1",
                   help="HTTP host address to serve from [default: %default]")
-parser.add_option("-p", "--http-port", dest="HTTP_PORT", metavar="PORT",
+options.add_option("-p", "--http-port", dest="HTTP_PORT", metavar="PORT",
                   default=8080, type=int,
                   help="HTTP port to serve from [default: %default]")
-parser.add_option("-C", "--irc-channel", dest="IRC_CHANNEL", metavar="CHANNEL",
+options.add_option("-C", "--irc-channel", dest="IRC_CHANNEL", metavar="CHANNEL",
                   default="#gnotty",
                   help="IRC channel to join [default: %default]")
-parser.add_option("-c", "--bot-class", dest="BOT_CLASS",
+options.add_option("-c", "--bot-class", dest="BOT_CLASS",
                   metavar="DOTTED_PYTHON_PATH",
                   default="gnotty.bots.LoggingBot",
                   help="Dotted Python path to the IRC client bot class to run "
                        "[default: %default]")
-parser.add_option("-n", "--bot-nickname", dest="BOT_NICKNAME",
+options.add_option("-n", "--bot-nickname", dest="BOT_NICKNAME",
                   metavar="NICKNAME", default="gnotty",
                   help="IRC nickname the bot will use [default: %default]")
-parser.add_option("-D", "--daemon", dest="DAEMON", action="store_true",
+options.add_option("-D", "--daemon", dest="DAEMON", action="store_true",
                   default=False,
                   help="run in daemon mode")
-parser.add_option("-k", "--kill", dest="KILL", action="store_true",
+options.add_option("-k", "--kill", dest="KILL", action="store_true",
                   default=False,
                   help="Shuts down a previously started daemon")
-parser.add_option("-F", "--pid-file", dest="PID_FILE", metavar="FILE_PATH",
+options.add_option("-F", "--pid-file", dest="PID_FILE", metavar="FILE_PATH",
                   help="path to write PID file to when in daemon mode")
-parser.add_option("-f", "--conf-file", dest="CONF_FILE", metavar="FILE_PATH",
+options.add_option("-f", "--conf-file", dest="CONF_FILE", metavar="FILE_PATH",
                   help="path to a Python config file to load options from")
+parser.add_option_group(options)
 
 
 class Settings(dict):
@@ -55,6 +57,7 @@ class Settings(dict):
         """
         Try and initialize with Django settings.
         """
+        self.option_list = parser.option_groups[0].option_list
         # Some constants about the software.
         self["GNOTTY_VERSION"] = __version__
         self["GNOTTY_VERSION_STRING"] = __version_string__
@@ -89,7 +92,7 @@ class Settings(dict):
         file_settings = {}
         if options.CONF_FILE:
             execfile(options.CONF_FILE, {}, file_settings)
-        for option in parser.option_list:
+        for option in self.option_list:
             if option.dest:
                 file_value = file_settings.get("GNOTTY_%s" % option.dest, None)
                 # optparse doesn't seem to provide a way to determine if

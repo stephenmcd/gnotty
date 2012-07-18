@@ -4,9 +4,13 @@ patch_all()
 
 from django.core.management.base import BaseCommand
 
-from gnotty.server import serve_forever
+from gnotty.conf import settings
 
 
 class Command(BaseCommand):
+
+    option_list = BaseCommand.option_list + tuple(settings.option_list)
+
     def handle(self, *args, **options):
+        from gnotty.server import serve_forever
         serve_forever(socketio_only=True)
