@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 class IRCMessage(models.Model):
     """
-    An IRC message logged by the logging client from the
+    An IRC message logged by the DjangoBot from the
     ``run_gnotty`` management command.
     """
 

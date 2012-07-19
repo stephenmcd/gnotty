@@ -70,37 +70,10 @@ class IRCApplication(object):
                              settings.IRC_CHANNEL, settings.BOT_NICKNAME)
         spawn(self.bot.start)
 
-    def index(self):
-        """
-        Loads the chat interface template, manually dealing with the
-        Django template bits.
-        """
-        root_dir = os.path.dirname(__file__)
-        template_dir = os.path.join(root_dir, "templates", "gnotty")
-        with open(os.path.join(template_dir, "base.html"), "r") as f:
-            base = f.read()
-        with open(os.path.join(template_dir, "chat.html"), "r") as f:
-            base = base.replace("{% block content %}", f.read())
-        replace = {
-            "{% block content %}": "",
-            "{% endblock %}": "",
-            "{% load gnotty_tags %}": "",
-            "{% extends \"gnotty/base.html\" %}": "",
-            "{% url gnotty_chat %}": "/",
-            "{% gnotty_nav %}": "",
-            "{% templatetag openvariable %}": "{{",
-            "{% templatetag closevariable %}": "}}",
-        }
-        for k, v in replace.items():
-            base = base.replace(k, v)
-        for k, v in settings.items():
-            base = base.replace("{{ %s }}" % k, unicode(v or ""))
-        return base
-
     def respond_webhook(self, environ):
         """
-        Passes the request onto a bot with a webhook if one is running
-        and the webhook path is requested.
+        Passes the request onto a bot with a webhook if the webhook
+        path is requested.
         """
         try:
             response = self.bot.on_webhook(environ)
@@ -111,18 +84,6 @@ class IRCApplication(object):
         if not response or isinstance(response, basestring):
             response = (200, [], response)
         return response
-
-    def respond_django(self, environ):
-        """
-        Tries to redirect to a Django app if someone tries to
-        access an invalid URL.
-        """
-        environ["port"] = ""
-        if environ["SERVER_NAME"] in ("127.0.0.1", "localhost"):
-            environ["port"] = ":8000"
-        location = ("%(wsgi.url_scheme)s://" +
-            "%(SERVER_NAME)s%(port)s%(PATH_INFO)s") % environ
-        return (301, [("Location", location)], None)
 
     def respond_static(self, environ):
         """
@@ -146,6 +107,45 @@ class IRCApplication(object):
         if not data:
             status = 404
         return (status, [("Content-Type", content_type)], data)
+
+    def index(self):
+        """
+        Loads the chat interface template when Django isn't being
+        used, manually dealing with the Django template bits.
+        """
+        root_dir = os.path.dirname(__file__)
+        template_dir = os.path.join(root_dir, "templates", "gnotty")
+        with open(os.path.join(template_dir, "base.html"), "r") as f:
+            base = f.read()
+        with open(os.path.join(template_dir, "chat.html"), "r") as f:
+            base = base.replace("{% block content %}", f.read())
+        replace = {
+            "{% block content %}": "",
+            "{% endblock %}": "",
+            "{% load gnotty_tags %}": "",
+            "{% extends \"gnotty/base.html\" %}": "",
+            "{% url gnotty_chat %}": "/",
+            "{% gnotty_nav %}": "",
+            "{% templatetag openvariable %}": "{{",
+            "{% templatetag closevariable %}": "}}",
+        }
+        for k, v in replace.items():
+            base = base.replace(k, v)
+        for k, v in settings.items():
+            base = base.replace("{{ %s }}" % k, unicode(v or ""))
+        return base
+
+    def respond_django(self, environ):
+        """
+        Tries to redirect to a Django app if someone accesses an
+        invalid URL when Django is being used.
+        """
+        environ["port"] = ""
+        if environ["SERVER_NAME"] in ("127.0.0.1", "localhost"):
+            environ["port"] = ":8000"
+        location = ("%(wsgi.url_scheme)s://" +
+            "%(SERVER_NAME)s%(port)s%(PATH_INFO)s") % environ
+        return (301, [("Location", location)], None)
 
     def __call__(self, environ, start_response):
         """
