@@ -52,6 +52,16 @@ class IRCApplication(object):
 
     def __init__(self, django=False):
         self.django = django
+        self.bot = None
+        # Load the bot.
+        if settings.BOT_CLASS:
+            module, attr = settings.BOT_CLASS.rsplit(".", 1)
+            __import__(module)
+            bot_class = getattr(sys.modules[module], attr)
+            self.bot = bot_class(settings.IRC_HOST, settings.IRC_PORT,
+                                 settings.IRC_CHANNEL, settings.BOT_NICKNAME)
+            spawn(self.bot.start)
+        self.webhook = hasattr(self.bot, "on_webhook")
 
     def index(self):
         """
@@ -80,71 +90,77 @@ class IRCApplication(object):
             base = base.replace("{{ %s }}" % k, unicode(v or ""))
         return base
 
-    def static(self, path):
+    def respond_webhook(self, environ):
         """
-        Loads a static file.
+        Passes the request onto a bot running with webhook if one is
+        running and the webhook path is requested.
         """
-        path = os.path.join(os.path.dirname(__file__), path)
         try:
-            with open(path, "r") as f:
-                return f.read()
-        except IOError:
-            pass
+            response = self.bot.on_webhook(environ)
+        except:
+            return ("500 INTERNAL SERVER ERROR", [], "")
+        if not response or isinstance(response, basestring):
+            response = ("200 OK", [], response or "")
+        return response
 
-    def __call__(self, environ, start_response):
+    def respond_django(self, environ):
         """
-        WSGI application handler.
+        Tries to redirect to a Django app if someone tries to
+        access an invalid URL.
         """
-        # socket.io handler.
-        path = os.path.normpath(environ["PATH_INFO"]).lstrip("/")
-        if path.startswith("socket.io/"):
-            socketio_manage(environ, {"": IRCNamespace})
-            return
-        # For Django we only host the socket.io handler, so try and
-        # redirect to the Django app.
-        if self.django:
-            environ["port"] = ""
-            if environ["SERVER_NAME"] in ("127.0.0.1", "localhost"):
-                environ["port"] = ":8000"
-            location = ("%(wsgi.url_scheme)s://" +
-                "%(SERVER_NAME)s%(port)s%(PATH_INFO)s") % environ
-            start_response("301 MOVED PERMANENTLY", [("Location", location)])
-            return []
-        # Static file or template when not using Django.
+        environ["port"] = ""
+        if environ["SERVER_NAME"] in ("127.0.0.1", "localhost"):
+            environ["port"] = ":8000"
+        location = ("%(wsgi.url_scheme)s://" +
+            "%(SERVER_NAME)s%(port)s%(PATH_INFO)s") % environ
+        return ("301 MOVED PERMANENTLY", [("Location", location)], "")
+
+    def respond_static(self, path):
+        """
+        Serves a static file when Django isn't being used.
+        """
         status = "200 OK"
         content_type = "text/html"
         data = None
         if not path:
             data = self.index()
         else:
-            data = self.static(path)
+            path = os.path.join(os.path.dirname(__file__), path)
+            try:
+                with open(path, "r") as f:
+                    data = f.read()
+            except IOError:
+                pass
             if data:
                 content_type = guess_type(path)[0]
         if not data:
             status = "404 NOT FOUND"
             data = "<h1>Not Found</h1>"
-        start_response(status, [
-            ("Content-Type", content_type),
-            ("Server", settings.GNOTTY_VERSION_STRING)
-        ])
+        return (status, [("Content-Type", content_type)], data)
+
+    def __call__(self, environ, start_response):
+        """
+        WSGI application handler.
+        """
+        path = os.path.normpath(environ["PATH_INFO"]).lstrip("/")
+        if path.startswith("socket.io/"):
+            socketio_manage(environ, {"": IRCNamespace})
+            return
+        elif path.startswith("webhook/") and self.webhook:
+            status, headers, data = self.respond_webhook(environ)
+        elif self.django:
+            status, headers, data = self.respond_django(environ)
+        else:
+            status, headers, data = self.respond_static(path)
+        headers.append(("Server", settings.GNOTTY_VERSION_STRING))
+        start_response(status, headers)
         return [data]
-
-
-def _import(class_path):
-    module, attr = class_path.rsplit(".", 1)
-    __import__(module)
-    return getattr(sys.modules[module], attr)
 
 
 def serve_forever(django=False):
     """
     Starts the gevent-socketio server.
     """
-    if settings.BOT_CLASS:
-        bot_class = _import(settings.BOT_CLASS)
-        bot = bot_class(settings.IRC_HOST, settings.IRC_PORT,
-                        settings.IRC_CHANNEL, settings.BOT_NICKNAME)
-        spawn(bot.start)
     host_port = (settings.HTTP_HOST, settings.HTTP_PORT)
     server = SocketIOServer(host_port, IRCApplication(django),
                             resource="socket.io", policy_server=False)
