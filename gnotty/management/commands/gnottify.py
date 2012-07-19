@@ -13,4 +13,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         from gnotty.server import serve_forever
-        serve_forever(socketio_only=True)
+        serve_forever(django=True)

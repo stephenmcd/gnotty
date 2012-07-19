@@ -50,8 +50,8 @@ class IRCNamespace(BaseNamespace):
 
 class IRCApplication(object):
 
-    def __init__(self, socketio_only=False):
-        self.socketio_only = socketio_only
+    def __init__(self, django=False):
+        self.django = django
 
     def index(self):
         """
@@ -95,26 +95,34 @@ class IRCApplication(object):
         """
         WSGI application handler.
         """
+        # socket.io handler.
         path = os.path.normpath(environ["PATH_INFO"]).lstrip("/")
         if path.startswith("socket.io/"):
             socketio_manage(environ, {"": IRCNamespace})
             return
-
+        # For Django we only host the socket.io handler, so try and
+        # redirect to the Django app.
+        if self.django:
+            environ["port"] = ""
+            if environ["SERVER_NAME"] in ("127.0.0.1", "localhost"):
+                environ["port"] = ":8000"
+            location = ("%(wsgi.url_scheme)s://" +
+                "%(SERVER_NAME)s%(port)s%(PATH_INFO)s") % environ
+            start_response("301 MOVED PERMANENTLY", [("Location", location)])
+            return []
+        # Static file or template when not using Django.
         status = "200 OK"
         content_type = "text/html"
         data = None
-
-        if not self.socketio_only:
-            if not path:
-                data = self.index()
-            else:
-                data = self.static(path)
-                if data:
-                    content_type = guess_type(path)[0]
+        if not path:
+            data = self.index()
+        else:
+            data = self.static(path)
+            if data:
+                content_type = guess_type(path)[0]
         if not data:
-            status = "404 Not Found"
+            status = "404 NOT FOUND"
             data = "<h1>Not Found</h1>"
-
         start_response(status, [
             ("Content-Type", content_type),
             ("Server", settings.GNOTTY_VERSION_STRING)
@@ -128,7 +136,7 @@ def _import(class_path):
     return getattr(sys.modules[module], attr)
 
 
-def serve_forever(socketio_only=False):
+def serve_forever(django=False):
     """
     Starts the gevent-socketio server.
     """
@@ -138,7 +146,7 @@ def serve_forever(socketio_only=False):
                         settings.IRC_CHANNEL, settings.BOT_NICKNAME)
         spawn(bot.start)
     host_port = (settings.HTTP_HOST, settings.HTTP_PORT)
-    server = SocketIOServer(host_port, IRCApplication(socketio_only),
+    server = SocketIOServer(host_port, IRCApplication(django),
                             resource="socket.io", policy_server=False)
     print "%s listening on %s:%s" % (
           (settings.GNOTTY_VERSION_STRING,) + host_port)

@@ -1,4 +1,3 @@
 * Multiple channels
 * Tests
 * IRC passwords
-* Redirect to port 80 if Django client accessed
