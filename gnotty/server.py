@@ -115,19 +115,20 @@ class IRCApplication(object):
             "%(SERVER_NAME)s%(port)s%(PATH_INFO)s") % environ
         return ("301 MOVED PERMANENTLY", [("Location", location)], "")
 
-    def respond_static(self, path):
+    def respond_static(self, environ):
         """
         Serves a static file when Django isn't being used.
         """
+        root = os.path.dirname(__file__)
+        path = os.path.normpath(environ["PATH_INFO"])
         status = "200 OK"
         content_type = "text/html"
         data = None
-        if not path:
+        if path == "/":
             data = self.index()
         else:
-            path = os.path.join(os.path.dirname(__file__), path)
             try:
-                with open(path, "r") as f:
+                with open(os.path.join(root, path.lstrip("/")), "r") as f:
                     data = f.read()
             except IOError:
                 pass
@@ -142,16 +143,17 @@ class IRCApplication(object):
         """
         WSGI application handler.
         """
-        path = os.path.normpath(environ["PATH_INFO"]).lstrip("/")
-        if path.startswith("socket.io/"):
+        path = environ["PATH_INFO"]
+        if path.startswith("/socket.io/"):
             socketio_manage(environ, {"": IRCNamespace})
             return
-        elif path.startswith("webhook/") and self.webhook:
-            status, headers, data = self.respond_webhook(environ)
+        if path.startswith("/webhook/") and self.webhook:
+            dispatch = self.respond_webhook
         elif self.django:
-            status, headers, data = self.respond_django(environ)
+            dispatch = self.respond_django
         else:
-            status, headers, data = self.respond_static(path)
+            dispatch = self.respond_static
+        status, headers, data = dispatch(environ)
         headers.append(("Server", settings.GNOTTY_VERSION_STRING))
         start_response(status, headers)
         return [data]
@@ -195,7 +197,7 @@ def run():
         else:
             print "Could not kill any daemons"
         return
-    if kill(pid_file):
+    elif kill(pid_file):
         print "Running daemon killed"
     if settings.DAEMON:
         daemonize(pid_file)
