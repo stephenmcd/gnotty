@@ -2,9 +2,10 @@
 from gnotty.client import BaseIRCClient
 
 
-class LoggingBot(BaseIRCClient):
+class BaseBot(BaseIRCClient):
     """
-    Subclassable IRC bot that simply logs each channel message.
+    Base bot class. Defines the log and webook methods for subclasses
+    to override.
     """
 
     def log(self, **kwargs):
@@ -32,10 +33,13 @@ class LoggingBot(BaseIRCClient):
             self.log(**self.log_args(event, message))
 
     def on_webhook(self, environ):
-        raise NotImplemented
+        raise NotImplementedError
 
 
-class ModelLoggingBot(LoggingBot):
+class DjangoBot(BaseBot):
+    """
+    Bot for Django integration that logs messages to a database.
+    """
 
     def log(self, **kwargs):
         from gnotty.models import IRCMessage

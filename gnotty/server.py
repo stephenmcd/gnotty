@@ -59,17 +59,16 @@ class IRCNamespace(BaseNamespace):
 class IRCApplication(object):
 
     def __init__(self, django=False):
+        """
+        Loads and starts the IRC bot for the entire application.
+        """
         self.django = django
-        self.bot = None
-        # Load the bot.
-        if settings.BOT_CLASS:
-            module, attr = settings.BOT_CLASS.rsplit(".", 1)
-            __import__(module)
-            bot_class = getattr(sys.modules[module], attr)
-            self.bot = bot_class(settings.IRC_HOST, settings.IRC_PORT,
-                                 settings.IRC_CHANNEL, settings.BOT_NICKNAME)
-            spawn(self.bot.start)
-        self.webhook = hasattr(self.bot, "on_webhook")
+        module_name, class_name = settings.BOT_CLASS.rsplit(".", 1)
+        __import__(module_name)
+        bot_class = getattr(sys.modules[module_name], class_name)
+        self.bot = bot_class(settings.IRC_HOST, settings.IRC_PORT,
+                             settings.IRC_CHANNEL, settings.BOT_NICKNAME)
+        spawn(self.bot.start)
 
     def index(self):
         """
@@ -105,9 +104,9 @@ class IRCApplication(object):
         """
         try:
             response = self.bot.on_webhook(environ)
-        except NotImplemented:
+        except NotImplementedError:
             return (404, [], None)
-        except Exception:
+        except:
             return (500, [], None)
         if not response or isinstance(response, basestring):
             response = (200, [], response)
@@ -156,7 +155,7 @@ class IRCApplication(object):
         if path.startswith("/socket.io/"):
             socketio_manage(environ, {"": IRCNamespace})
             return
-        if path.startswith("/webhook/") and self.webhook:
+        if path.startswith("/webhook/"):
             dispatch = self.respond_webhook
         elif self.django:
             dispatch = self.respond_django

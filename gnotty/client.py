@@ -42,6 +42,12 @@ class BaseIRCClient(SimpleIRCClient):
         self.nickname += str(digits)
         self.connect(self.host, self.port, self.nickname)
 
+    def message_channel(self, message):
+        """
+        Nicer shortcut for sending a message to a channel.
+        """
+        self.connection.privmsg(self.channel, message)
+
 
 class WebSocketIRCClient(BaseIRCClient):
     """
@@ -60,7 +66,7 @@ class WebSocketIRCClient(BaseIRCClient):
         """
         if self.nickname in self.nicknames:
             message = message[:settings.MAX_MESSAGE_LENGTH]
-            self.connection.privmsg(self.channel, message)
+            self.message_channel(message)
             self.namespace.emit("message", self.nickname, message)
 
     def emit_nicknames(self):

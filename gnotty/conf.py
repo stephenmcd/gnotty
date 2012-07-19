@@ -25,7 +25,7 @@ options.add_option("-C", "--irc-channel", dest="IRC_CHANNEL", metavar="CHANNEL",
                   help="IRC channel to join [default: %default]")
 options.add_option("-c", "--bot-class", dest="BOT_CLASS",
                   metavar="DOTTED_PYTHON_PATH",
-                  default="gnotty.bots.LoggingBot",
+                  default="gnotty.bots.BaseBot",
                   help="Dotted Python path to the IRC client bot class to run "
                        "[default: %default]")
 options.add_option("-n", "--bot-nickname", dest="BOT_NICKNAME",
@@ -63,7 +63,7 @@ class Settings(dict):
         self["GNOTTY_VERSION_STRING"] = __version_string__
         self["GNOTTY_PROJECT_URL"] = __url__
         django_defaults = {
-            "BOT_CLASS": "gnotty.bots.ModelLoggingBot",
+            "BOT_CLASS": "gnotty.bots.DjangoBot",
         }
         try:
             from django.conf import settings
