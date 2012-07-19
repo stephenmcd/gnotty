@@ -31,6 +31,9 @@ class LoggingBot(BaseIRCClient):
         for message in event.arguments():
             self.log(**self.log_args(event, message))
 
+    def on_webhook(self, environ):
+        raise NotImplemented
+
 
 class ModelLoggingBot(LoggingBot):
 
@@ -38,9 +41,3 @@ class ModelLoggingBot(LoggingBot):
         from gnotty.models import IRCMessage
         LoggingBot.log(self, **kwargs)
         IRCMessage.objects.create(**kwargs)
-
-
-class WebHookBot(LoggingBot):
-
-    def on_webhook(self, environ):
-        pass

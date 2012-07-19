@@ -18,6 +18,14 @@ from gnotty.client import WebSocketIRCClient
 from gnotty.conf import settings
 
 
+HTTP_STATUS_TEXT = {
+    200: "OK",
+    301: "MOVED PERMANENTLY",
+    404: "NOT FOUND",
+    500: "INTERNAL SERVER ERROR",
+}
+
+
 class IRCNamespace(BaseNamespace):
     """
     gevent-socketio namespace that's bridged with an IRC client.
@@ -92,15 +100,17 @@ class IRCApplication(object):
 
     def respond_webhook(self, environ):
         """
-        Passes the request onto a bot running with webhook if one is
-        running and the webhook path is requested.
+        Passes the request onto a bot with a webhook if one is running
+        and the webhook path is requested.
         """
         try:
             response = self.bot.on_webhook(environ)
-        except:
-            return ("500 INTERNAL SERVER ERROR", [], "")
+        except NotImplemented:
+            return (404, [], None)
+        except Exception:
+            return (500, [], None)
         if not response or isinstance(response, basestring):
-            response = ("200 OK", [], response or "")
+            response = (200, [], response)
         return response
 
     def respond_django(self, environ):
@@ -113,7 +123,7 @@ class IRCApplication(object):
             environ["port"] = ":8000"
         location = ("%(wsgi.url_scheme)s://" +
             "%(SERVER_NAME)s%(port)s%(PATH_INFO)s") % environ
-        return ("301 MOVED PERMANENTLY", [("Location", location)], "")
+        return (301, [("Location", location)], None)
 
     def respond_static(self, environ):
         """
@@ -121,7 +131,7 @@ class IRCApplication(object):
         """
         root = os.path.dirname(__file__)
         path = os.path.normpath(environ["PATH_INFO"])
-        status = "200 OK"
+        status = 200
         content_type = "text/html"
         data = None
         if path == "/":
@@ -135,8 +145,7 @@ class IRCApplication(object):
             if data:
                 content_type = guess_type(path)[0]
         if not data:
-            status = "404 NOT FOUND"
-            data = "<h1>Not Found</h1>"
+            status = 404
         return (status, [("Content-Type", content_type)], data)
 
     def __call__(self, environ, start_response):
@@ -155,8 +164,8 @@ class IRCApplication(object):
             dispatch = self.respond_static
         status, headers, data = dispatch(environ)
         headers.append(("Server", settings.GNOTTY_VERSION_STRING))
-        start_response(status, headers)
-        return [data]
+        start_response("%s %s" % (status, HTTP_STATUS_TEXT[status]), headers)
+        return [data or "<h1>%s</h1>" % HTTP_STATUS_TEXT[status].title()]
 
 
 def serve_forever(django=False):
