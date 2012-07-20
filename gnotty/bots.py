@@ -43,5 +43,5 @@ class DjangoBot(BaseBot):
 
     def log(self, **kwargs):
         from gnotty.models import IRCMessage
-        LoggingBot.log(self, **kwargs)
         IRCMessage.objects.create(**kwargs)
+        super(DjangoBot, self).log(**kwargs)

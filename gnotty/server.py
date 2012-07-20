@@ -93,20 +93,20 @@ class IRCApplication(object):
         path = os.path.normpath(environ["PATH_INFO"])
         status = 200
         content_type = "text/html"
-        data = None
+        content = None
         if path == "/":
-            data = self.index()
+            content = self.index()
         else:
             try:
                 with open(os.path.join(root, path.lstrip("/")), "r") as f:
-                    data = f.read()
+                    content = f.read()
             except IOError:
                 pass
-            if data:
+            if content:
                 content_type = guess_type(path)[0]
-        if not data:
+        if not content:
             status = 404
-        return (status, [("Content-Type", content_type)], data)
+        return (status, [("Content-Type", content_type)], content)
 
     def index(self):
         """
@@ -161,10 +161,10 @@ class IRCApplication(object):
             dispatch = self.respond_django
         else:
             dispatch = self.respond_static
-        status, headers, data = dispatch(environ)
+        status, headers, content = dispatch(environ)
         headers.append(("Server", settings.GNOTTY_VERSION_STRING))
         start_response("%s %s" % (status, HTTP_STATUS_TEXT[status]), headers)
-        return [data or "<h1>%s</h1>" % HTTP_STATUS_TEXT[status].title()]
+        return [content or "<h1>%s</h1>" % HTTP_STATUS_TEXT[status].title()]
 
 
 def serve_forever(django=False):

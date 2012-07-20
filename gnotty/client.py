@@ -3,7 +3,7 @@ from gnotty.conf import settings
 from gnotty.lib.irclib import SimpleIRCClient
 
 
-class BaseIRCClient(SimpleIRCClient):
+class BaseIRCClient(object, SimpleIRCClient):
     """
     Base class for IRC clients. Handles initial connection and
     channel join. Currently only supports a single channel.
@@ -57,7 +57,8 @@ class WebSocketIRCClient(BaseIRCClient):
     def __init__(self, host, port, channel, nickname, namespace):
         self.nicknames = set()
         self.namespace = namespace
-        BaseIRCClient.__init__(self, host, port, channel, nickname)
+        client_args = (host, port, channel, nickname)
+        super(WebSocketIRCClient, self).__init__(*client_args)
 
     def emit_message(self, message):
         """
