@@ -101,10 +101,14 @@ class Settings(dict):
                 # since provided CLI args should take precedence over
                 # any settings defined in a conf module.
                 flags = option._short_opts + option._long_opts
-                if file_value and not set(flags) & set(sys.argv):
+                in_argv = set(flags) & set(sys.argv)
+                options_value = getattr(options, option.dest)
+                if file_value and not in_argv:
                     self[option.dest] = file_value
+                elif in_argv:
+                    self[option.dest] = options_value
                 else:
-                    self[option.dest] = getattr(options, option.dest)
+                    self[option.dest] = self.get(option.dest, options_value)
         self.set_max_message_length()
         self["STATIC_URL"] = "/static/"
 
