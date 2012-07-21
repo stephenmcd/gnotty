@@ -3,7 +3,7 @@ from gnotty.conf import settings
 from gnotty.lib.irclib import SimpleIRCClient
 
 
-class BaseIRCClient(object, SimpleIRCClient):
+class BaseIRCClient(SimpleIRCClient, object):
     """
     Base class for IRC clients. Handles initial connection and
     channel join. Currently only supports a single channel.
