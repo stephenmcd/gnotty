@@ -73,7 +73,7 @@ class ChatMixin(object):
             from warnings import warn
             warn("ChatMixin requires nltk installed")
         else:
-            get_bot = lambda x: x[0].func_globals["%sbot" % x[0].__name__
+            get_bot = lambda x: x[0].func_globals["%sbot" % x[0].__name__]
             self.chatbots = map(get_bot, bots)
 
     def message_channel_delayed(self, message):

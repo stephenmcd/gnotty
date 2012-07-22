@@ -19,6 +19,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "gevent-socketio==0.3.5-beta",
+        "irc==2.0",
         "daemon==1.0",
         "sphinx-me",
     ],

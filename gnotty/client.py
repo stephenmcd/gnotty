@@ -1,6 +1,7 @@
 
+from irc.client import SimpleIRCClient
+
 from gnotty.conf import settings
-from gnotty.lib.irclib import SimpleIRCClient
 
 
 class BaseIRCClient(SimpleIRCClient, object):
