@@ -78,35 +78,30 @@ class IRCApplication(object):
         try:
             response = self.bot.on_webhook(environ)
         except NotImplementedError:
-            return (404, [], None)
+            return 404
         except:
-            return (500, [], None)
+            return 500
         if not response or isinstance(response, basestring):
-            response = (200, [], response)
+            return 200
         return response
 
     def respond_static(self, environ):
         """
         Serves a static file when Django isn't being used.
         """
-        root = os.path.dirname(__file__)
-        path = os.path.normpath(environ["PATH_INFO"])
-        status = 200
-        content_type = "text/html"
         content = None
         if path == "/":
             content = self.index()
+            content_type = "text/html"
         else:
+            root = os.path.dirname(__file__)
+            path = os.path.normpath(environ["PATH_INFO"])
             try:
                 with open(os.path.join(root, path.lstrip("/")), "r") as f:
                     content = f.read()
             except IOError:
-                pass
-            if content:
-                content_type = guess_type(path)[0]
-        if not content:
-            status = 404
-        return (status, [("Content-Type", content_type)], content)
+                return 404
+        return (200, [("Content-Type", guess_type(path)[0])], content)
 
     def index(self):
         """
@@ -161,21 +156,35 @@ class IRCApplication(object):
             dispatch = self.respond_django
         else:
             dispatch = self.respond_static
-        status, headers, content = dispatch(environ)
+        response = dispatch(environ)
+        if isinstance(response, int):
+            response = (response, [], None)
+        elif isinstance(response, basestring):
+            response = (200, [], response)
+        status, headers, content = response
+        status_text = HTTP_STATUS_TEXT.get(status, "")
         headers.append(("Server", settings.GNOTTY_VERSION_STRING))
-        start_response("%s %s" % (status, HTTP_STATUS_TEXT[status]), headers)
-        return [content or "<h1>%s</h1>" % HTTP_STATUS_TEXT[status].title()]
+        start_response("%s %s" % (status, status_text), headers)
+        if content is None:
+            if status == 200:
+                content = ""
+            else:
+                content = "<h1>%s</h1>" % status_text.title()
+        return [content]
 
 
 def serve_forever(django=False):
     """
     Starts the gevent-socketio server.
     """
-    host_port = (settings.HTTP_HOST, settings.HTTP_PORT)
-    server = SocketIOServer(host_port, IRCApplication(django),
-                            resource="socket.io", policy_server=False)
-    print "%s listening on %s:%s" % (
-          (settings.GNOTTY_VERSION_STRING,) + host_port)
+    app = IRCApplication(django)
+    server = SocketIOServer((settings.HTTP_HOST, settings.HTTP_PORT), app)
+    print "%s [%s] listening on %s:%s" % (
+        settings.GNOTTY_VERSION_STRING,
+        app.bot.__class__.__name__,
+        settings.HTTP_HOST,
+        settings.HTTP_PORT,
+    )
     server.serve_forever()
 
 
