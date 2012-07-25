@@ -1,4 +1,6 @@
 
+from cgi import FieldStorage
+from json import loads
 from random import choice, randint
 
 from gevent import sleep
@@ -58,9 +60,9 @@ class DjangoBot(BaseBot):
         super(DjangoBot, self).log(**kwargs)
 
 
-class ChatMixin(object):
+class ChatBot(BaseBot):
     """
-    A demo bot mixin that greets and responds to people.
+    A demo bot that greets and responds to people.
     """
 
     def __init__(self, *args, **kwargs):
@@ -102,3 +104,69 @@ class ChatMixin(object):
                 chatbot = choice(self.chatbots)
                 reply = chatbot.respond(message.replace(prefix, "", 1))
                 self.message_channel_delayed("%s: %s" % (nickname, reply))
+
+
+class CommitBot(BaseBot):
+    """
+    Base bot for GitHub/BitBucket post-push webhooks. Accepts the
+    webhook payload and writes out new commits and URLs to the
+    channel.
+    """
+
+    def on_webhook(self, environ):
+        request = FieldStorage(fp=environ["wsgi.input"], environ=environ)
+        payload = loads(request["payload"].value)
+        commit = lambda c: "%s - %s" % (c["message"], self.author(c))
+        messages = [commit(c) for c in payload["commits"]]
+        if len(messages) == 1:
+            messages[0] = "%s %s" % (messages[0], self.commit_url(commit))
+        else:
+            commits = len(payload["commits"])
+            diff_url = self.diff_url(payload)
+            messages.append("%s new commits: %s" % (commits, diff_url))
+        for message in messages:
+            self.message_channel(message)
+
+    def author(self, commit):
+        raise NotImplementedError
+
+    def commit_url(self, commit, payload):
+        raise NotImplementedError
+
+    def diff_url(self, payload):
+        raise NotImplementedError
+
+
+class GitHubBot(CommitBot):
+    """
+    GitHub post-push webhook bot.
+    """
+
+    def author(self, commit):
+        return commit["committer"]["name"]
+
+    def commit_url(self, commit, payload):
+        return commit["url"]
+
+    def diff_url(self, payload):
+        return payload["compare"]
+
+
+class BitBucketBot(CommitBot):
+    """
+    BitBucket post-push webhook bot.
+    """
+
+    def repo_url(self, payload):
+        return payload["canon_url"] + payload["repository"]["absolute_url"]
+
+    def author(self, commit):
+        return commit["raw_author"].split("<")[0]
+
+    def commit_url(self, commit, payload):
+        return "%schangeset/%s/" % (self.repo_url(payload), commit["node"])
+
+    def diff_url(self, payload):
+        f, l = payload["commits"][0]["node"], payload["commits"][-1]["node"]
+        return "%scompare/%s..%s" % (self.repo_url(payload), f, l)
+

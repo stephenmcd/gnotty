@@ -1,3 +1,4 @@
 * Multiple channels
 * Tests
 * IRC passwords
+* Merge base Django/non-Django bots into one and use Python logging module.
