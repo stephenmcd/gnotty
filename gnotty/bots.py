@@ -65,14 +65,14 @@ class ChatBot(BaseBot):
     """
 
     def __init__(self, *args, **kwargs):
-        super(ChatMixin, self).__init__(*args, **kwargs)
+        super(ChatBot, self).__init__(*args, **kwargs)
         self.chatbots = []
         self.greetings = ("Hi", "Hello", "Howdy", "Welcome")
         try:
             from nltk.chat import bots
         except ImportError:
             from warnings import warn
-            warn("ChatMixin requires nltk installed")
+            warn("ChatBot requires nltk installed")
         else:
             get_bot = lambda x: x[0].func_globals["%sbot" % x[0].__name__]
             self.chatbots = map(get_bot, bots)
@@ -86,14 +86,14 @@ class ChatBot(BaseBot):
         self.message_channel(message)
 
     def on_join(self, connection, event):
-        super(ChatMixin, self).on_join(connection, event)
+        super(ChatBot, self).on_join(connection, event)
         nickname = self.get_nickname(event)
         greeting = choice(self.greetings)
         if nickname != self.nickname:
             self.message_channel_delayed("%s: %s" % (nickname, greeting))
 
     def on_pubmsg(self, connection, event):
-        super(ChatMixin, self).on_pubmsg(connection, event)
+        super(ChatBot, self).on_pubmsg(connection, event)
         if not self.chatbots:
             return
         for message in event.arguments():
@@ -119,9 +119,8 @@ class CommitBot(BaseBot):
         if len(messages) == 1:
             messages[0] = "%s %s" % (messages[0], self.commit_url(commit))
         else:
-            commits = len(payload["commits"])
-            diff_url = self.diff_url(payload)
-            messages.append("%s new commits: %s" % (commits, diff_url))
+            messages.insert(0, "%s new commits:" % len(payload["commits"]))
+            messages.append("Compare view: %s" % self.diff_url(payload))
         for message in messages:
             self.message_channel(message)
 
@@ -167,4 +166,3 @@ class BitBucketBot(CommitBot):
     def diff_url(self, payload):
         f, l = payload["commits"][0]["node"], payload["commits"][-1]["node"]
         return "%scompare/%s..%s" % (self.repo_url(payload), f, l)
-

@@ -20,8 +20,8 @@ options.add_option("-a", "--http-host", dest="HTTP_HOST", metavar="HOST",
 options.add_option("-p", "--http-port", dest="HTTP_PORT", metavar="PORT",
                   default=8080, type=int,
                   help="HTTP port to serve from [default: %default]")
-options.add_option("-C", "--irc-channel", dest="IRC_CHANNEL", metavar="CHANNEL",
-                  default="#gnotty",
+options.add_option("-C", "--irc-channel", dest="IRC_CHANNEL",
+                  metavar="CHANNEL", default="#gnotty",
                   help="IRC channel to join [default: %default]")
 options.add_option("-c", "--bot-class", dest="BOT_CLASS",
                   metavar="DOTTED_PYTHON_PATH",

@@ -85,27 +85,25 @@ class IRCApplication(object):
             return 404
         except:
             return 500
-        if not response or isinstance(response, basestring):
-            return 200
-        return response
+        return response or 200
 
     def respond_static(self, environ):
         """
         Serves a static file when Django isn't being used.
         """
-        content = None
+        path = os.path.normpath(environ["PATH_INFO"])
         if path == "/":
             content = self.index()
             content_type = "text/html"
         else:
-            root = os.path.dirname(__file__)
-            path = os.path.normpath(environ["PATH_INFO"])
+            path = os.path.join(os.path.dirname(__file__), path.lstrip("/"))
             try:
-                with open(os.path.join(root, path.lstrip("/")), "r") as f:
+                with open(path, "r") as f:
                     content = f.read()
             except IOError:
                 return 404
-        return (200, [("Content-Type", guess_type(path)[0])], content)
+            content_type = guess_type(path)[0]
+        return (200, [("Content-Type", content_type)], content)
 
     def index(self):
         """
