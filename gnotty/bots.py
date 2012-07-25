@@ -146,7 +146,7 @@ class GitHubBot(CommitBot):
         return commit["url"]
 
     def diff_url(self, payload):
-        return payload["compare"]
+        return payload["compare"].replace("^", "")
 
 
 class BitBucketBot(CommitBot):
@@ -165,4 +165,4 @@ class BitBucketBot(CommitBot):
 
     def diff_url(self, payload):
         f, l = payload["commits"][0]["node"], payload["commits"][-1]["node"]
-        return "%scompare/%s..%s" % (self.repo_url(payload), f, l)
+        return "%scompare/%s..%s" % (self.repo_url(payload), l, f)
