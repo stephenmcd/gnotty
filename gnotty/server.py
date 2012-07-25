@@ -4,10 +4,11 @@ from __future__ import with_statement
 from gevent import monkey, spawn
 monkey.patch_all()
 
+from cgi import FieldStorage
+from mimetypes import guess_type
 import os
 import sys
 from tempfile import gettempdir
-from mimetypes import guess_type
 
 from daemon import daemonize
 from socketio import socketio_manage
@@ -75,8 +76,11 @@ class IRCApplication(object):
         Passes the request onto a bot with a webhook if the webhook
         path is requested.
         """
+        request = FieldStorage(fp=environ["wsgi.input"], environ=environ)
+        url = environ["PATH_INFO"]
+        params = dict([(k, request[k].value) for k in request])
         try:
-            response = self.bot.on_webhook(environ)
+            response = self.bot.on_webhook(environ, url, params)
         except NotImplementedError:
             return 404
         except:

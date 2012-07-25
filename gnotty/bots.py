@@ -1,5 +1,4 @@
 
-from cgi import FieldStorage
 from json import loads
 from random import choice, randint
 
@@ -45,7 +44,7 @@ class BaseBot(BaseIRCClient):
         for message in event.arguments():
             self.log(**self.log_args(event, message))
 
-    def on_webhook(self, environ):
+    def on_webhook(self, environ, url, params):
         raise NotImplementedError
 
 
@@ -113,9 +112,8 @@ class CommitBot(BaseBot):
     channel.
     """
 
-    def on_webhook(self, environ):
-        request = FieldStorage(fp=environ["wsgi.input"], environ=environ)
-        payload = loads(request["payload"].value)
+    def on_webhook(self, environ, url, params):
+        payload = loads(params["payload"])
         commit = lambda c: "%s - %s" % (c["message"], self.author(c))
         messages = [commit(c) for c in payload["commits"]]
         if len(messages) == 1:
