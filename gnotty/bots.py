@@ -1,5 +1,6 @@
 
 from json import loads
+from logging import Formatter, StreamHandler, INFO, getLogger
 from random import choice, randint
 
 from gevent import sleep
@@ -13,50 +14,43 @@ class BaseBot(BaseIRCClient):
     to override.
     """
 
-    def log(self, **kwargs):
-        """
-        Log handler - override me.
-        """
-        print "[%(server)s%(channel)s] %(nickname)s: %(message)s" % kwargs
+    def __init__(self, *args, **kwargs):
+        super(BaseBot, self).__init__(*args, **kwargs)
+        fmt = Formatter("[%(server)s%(channel)s] %(nickname)s: %(message)s")
+        handler = StreamHandler()
+        handler.setLevel(INFO)
+        handler.setFormatter(fmt)
+        logger = getLogger("irc")
+        logger.setLevel(INFO)
+        logger.addHandler(handler)
 
-    def log_args(self, event, message, nickname=None):
-        return {
+    def log(self, event, message):
+        extra = {
             "server": self.connection.server,
             "channel": self.channel,
-            "nickname": nickname or self.get_nickname(event),
-            "message": message,
+            "nickname": self.get_nickname(event) if event else self.nickname,
         }
+        getLogger("irc").info(message, extra=extra)
 
     def message_channel(self, message):
         """
         We won't receive our own messages, so log them manually.
         """
-        self.log(**self.log_args(None, message, self.nickname))
+        self.log(None, message)
         super(BaseBot, self).message_channel(message)
 
     def on_join(self, connection, event):
-        self.log(**self.log_args(event, "joins"))
+        self.log(event, "joins")
 
     def on_quit(self, connection, event):
-        self.log(**self.log_args(event, "leaves"))
+        self.log(event, "leaves")
 
     def on_pubmsg(self, connection, event):
         for message in event.arguments():
-            self.log(**self.log_args(event, message))
+            self.log(event, message)
 
     def on_webhook(self, environ, url, params):
         raise NotImplementedError
-
-
-class DjangoBot(BaseBot):
-    """
-    Bot for Django integration that logs messages to a database.
-    """
-
-    def log(self, **kwargs):
-        from gnotty.models import IRCMessage
-        IRCMessage.objects.create(**kwargs)
-        super(DjangoBot, self).log(**kwargs)
 
 
 class ChatBot(BaseBot):

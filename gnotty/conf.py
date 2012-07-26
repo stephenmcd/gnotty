@@ -62,12 +62,9 @@ class Settings(dict):
         self["GNOTTY_VERSION"] = __version__
         self["GNOTTY_VERSION_STRING"] = __version_string__
         self["GNOTTY_PROJECT_URL"] = __url__
-        django_defaults = {
-            "BOT_CLASS": "gnotty.bots.DjangoBot",
-        }
         try:
             from django.conf import settings
-            for k, v in dict(parser.defaults, **django_defaults).items():
+            for k, v in parser.defaults.items():
                 self[k] = getattr(settings, "GNOTTY_%s" % k, v)
             self.set_max_message_length()
         except ImportError:
