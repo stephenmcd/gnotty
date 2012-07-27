@@ -10,8 +10,7 @@ from gnotty.client import BaseIRCClient
 
 class BaseBot(BaseIRCClient):
     """
-    Base bot class. Defines the log and webook methods for subclasses
-    to override.
+    Base bot class. Defines the log and webook methods.
     """
 
     def __init__(self, *args, **kwargs):
