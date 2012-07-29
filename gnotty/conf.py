@@ -9,18 +9,18 @@ from gnotty import __version__, __version_string__, __url__
 
 parser = OptionParser(usage="%prog [options]", version=__version__)
 options = OptionGroup(parser, "")
-options.add_option("-A", "--irc-host", dest="IRC_HOST", metavar="HOST",
-                  default="irc.freenode.net",
-                  help="IRC host address to connect to [default: %default]")
-options.add_option("-P", "--irc-port", dest="IRC_PORT", metavar="PORT",
-                  default=6667, type=int,
-                  help="IRC port to connect to [default: %default]")
 options.add_option("-a", "--http-host", dest="HTTP_HOST", metavar="HOST",
                   default="127.0.0.1",
                   help="HTTP host address to serve from [default: %default]")
 options.add_option("-p", "--http-port", dest="HTTP_PORT", metavar="PORT",
                   default=8080, type=int,
                   help="HTTP port to serve from [default: %default]")
+options.add_option("-A", "--irc-host", dest="IRC_HOST", metavar="HOST",
+                  default="irc.freenode.net",
+                  help="IRC host address to connect to [default: %default]")
+options.add_option("-P", "--irc-port", dest="IRC_PORT", metavar="PORT",
+                  default=6667, type=int,
+                  help="IRC port to connect to [default: %default]")
 options.add_option("-C", "--irc-channel", dest="IRC_CHANNEL",
                   metavar="CHANNEL", default="#gnotty",
                   help="IRC channel to join [default: %default]")

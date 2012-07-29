@@ -65,14 +65,14 @@ client, these same settings can be defined via the command line, or
 in a separate Python configuration module. See the "Stand-Alone Web
 Client" section below for details.
 
-  * ``GNOTTY_IRC_HOST`` - IRC host address to connect to.
-    *string, default: irc.freenode.net*
-  * ``GNOTTY_IRC_PORT`` - IRC port to connect to.
-    *integer, default: 6667*
   * ``GNOTTY_HTTP_HOST`` - HTTP host address to serve from.
     *string, default: 127.0.0.1*
   * ``GNOTTY_HTTP_PORT`` - HTTP port to serve from.
     *integer, default: 8080*
+  * ``GNOTTY_IRC_HOST`` - IRC host address to connect to.
+    *string, default: irc.freenode.net*
+  * ``GNOTTY_IRC_PORT`` - IRC port to connect to.
+    *integer, default: 6667*
   * ``GNOTTY_IRC_CHANNEL`` - IRC channel to join.
     *string, default: #gnotty*
   * ``GNOTTY_BOT_CLASS`` - Dotted Python path to the IRC client bot
@@ -155,18 +155,18 @@ arguments to it::
     Options:
       --version             show program's version number and exit
       -h, --help            show this help message and exit
-      -A HOST, --irc-host=HOST
-                            IRC host address to connect to
-                            [default: irc.freenode.net]
-      -P PORT, --irc-port=PORT
-                            IRC port to connect to
-                            [default: 6667]
       -a HOST, --http-host=HOST
                             HTTP host address to serve from
                             [default: 127.0.0.1]
       -p PORT, --http-port=PORT
                             HTTP port to serve from
                             [default: 8080]
+      -A HOST, --irc-host=HOST
+                            IRC host address to connect to
+                            [default: irc.freenode.net]
+      -P PORT, --irc-port=PORT
+                            IRC port to connect to
+                            [default: 6667]
       -C CHANNEL, --irc-channel=CHANNEL
                             IRC channel to join
                             [default: #gnotty]
