@@ -1,4 +1,6 @@
 
+from logging import getLogger
+
 from irc.client import SimpleIRCClient
 
 from gnotty.conf import settings
@@ -17,6 +19,11 @@ class BaseIRCClient(SimpleIRCClient, object):
         self.channel = channel
         self.nickname = nickname
         self.connect(self.host, self.port, self.nickname)
+
+    def _dispatcher(self, connection, event):
+        log = (event.eventtype(), self.nickname, "".join(event.arguments()))
+        getLogger("irc.dispatch").debug("%s: [%s] %s" % log)
+        SimpleIRCClient._dispatcher(self, connection, event)
 
     def get_nickname(self, event):
         """

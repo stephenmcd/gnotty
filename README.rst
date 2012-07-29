@@ -82,6 +82,9 @@ Client" section below for details.
   * ``GNOTTY_PID_FILE`` - path to write PID file to when in daemon
     mode.
     *string, default: [tmp]/gnotty-[http-host]-[http-port].pid*
+  * ``GNOTTY_LOG_LEVEL`` - Log level to use. ``DEBUG`` will spew out
+    all IRC data.
+    *string, default: INFO*
 
 To be clear: the IRC host and port are for specifing the IRC server to
 connect to. The HTTP host and port are what will be used to host the
@@ -171,6 +174,10 @@ arguments to it::
       -k, --kill            Shuts down a previously started daemon
       -F FILE_PATH, --pid-file=FILE_PATH
                             path to write PID file to when in daemon mode
+      -l INFO|DEBUG, --log-level=INFO|DEBUG
+                            Log level to use. DEBUG will spew out all IRC
+                            data.
+                            [default: INFO]
       -f FILE_PATH, --conf-file=FILE_PATH
                             path to a Python config file to load options from
 
@@ -275,7 +282,7 @@ Message Logging
 By default, each IRC message in the channel is logged by the IRC bot
 run by Gnotty. Logging occurs using `Python's logging module
 <http://docs.python.org/library/logging.html>`_, to the logger named
-``irc``.
+``irc.message``.
 
 Each log record contains the following attributes, where ``record`` is
 the log record instance:
@@ -295,7 +302,7 @@ Here's an example of adding an extra logging handler for IRC messages::
           # Do something cool with the log record.
           print record.msg
 
-  getLogger("irc").addHandler(MyLogHandler())
+  getLogger("irc.message").addHandler(MyLogHandler())
 
 JavaScript Client
 =================

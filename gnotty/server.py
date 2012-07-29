@@ -5,6 +5,7 @@ from gevent import monkey, spawn
 monkey.patch_all()
 
 from cgi import FieldStorage
+from logging import getLogger, DEBUG, StreamHandler, Formatter
 from mimetypes import guess_type
 import os
 import sys
@@ -179,6 +180,9 @@ def serve_forever(django=False):
     """
     Starts the gevent-socketio server.
     """
+    logger = getLogger("irc.dispatch")
+    logger.setLevel(settings.LOG_LEVEL)
+    logger.addHandler(StreamHandler())
     app = IRCApplication(django)
     server = SocketIOServer((settings.HTTP_HOST, settings.HTTP_PORT), app)
     print "%s [%s] listening on %s:%s" % (

@@ -1,5 +1,6 @@
 
 from __future__ import with_statement
+import logging
 from optparse import OptionParser, OptionGroup
 import sys
 
@@ -39,6 +40,10 @@ options.add_option("-k", "--kill", dest="KILL", action="store_true",
                   help="Shuts down a previously started daemon")
 options.add_option("-F", "--pid-file", dest="PID_FILE", metavar="FILE_PATH",
                   help="path to write PID file to when in daemon mode")
+options.add_option("-l", "--log-level", dest="LOG_LEVEL", metavar="INFO|DEBUG",
+                  choices=("INFO", "DEBUG"), default="INFO",
+                  help="Log level to use. DEBUG will spew out all IRC data. "
+                      "default: %default]")
 options.add_option("-f", "--conf-file", dest="CONF_FILE", metavar="FILE_PATH",
                   help="path to a Python config file to load options from")
 parser.add_option_group(options)
@@ -108,6 +113,7 @@ class Settings(dict):
                     self[option.dest] = self.get(option.dest, options_value)
         self.set_max_message_length()
         self["STATIC_URL"] = "/static/"
+        self["LOG_LEVEL"] = getattr(logging, self["LOG_LEVEL"])
 
 
 settings = Settings()

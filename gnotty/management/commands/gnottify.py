@@ -26,7 +26,7 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + tuple(settings.option_list)
 
     def handle(self, *args, **options):
-        getLogger("irc").addHandler(ModelLogger())
+        getLogger("irc.message").addHandler(ModelLogger())
         settings.parse_args()
         from gnotty.server import serve_forever
         serve_forever(django=True)

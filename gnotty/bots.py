@@ -6,6 +6,7 @@ from random import choice, randint
 from gevent import sleep
 
 from gnotty.client import BaseIRCClient
+from gnotty.conf import settings
 
 
 class BaseBot(BaseIRCClient):
@@ -17,10 +18,9 @@ class BaseBot(BaseIRCClient):
         super(BaseBot, self).__init__(*args, **kwargs)
         fmt = Formatter("[%(server)s%(channel)s] %(nickname)s: %(message)s")
         handler = StreamHandler()
-        handler.setLevel(INFO)
         handler.setFormatter(fmt)
-        logger = getLogger("irc")
-        logger.setLevel(INFO)
+        logger = getLogger("irc.message")
+        logger.setLevel(settings.LOG_LEVEL)
         logger.addHandler(handler)
 
     def log(self, event, message):
@@ -29,7 +29,7 @@ class BaseBot(BaseIRCClient):
             "channel": self.channel,
             "nickname": self.get_nickname(event) if event else self.nickname,
         }
-        getLogger("irc").info(message, extra=extra)
+        getLogger("irc.message").info(message, extra=extra)
 
     def message_channel(self, message):
         """
