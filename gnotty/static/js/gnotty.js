@@ -12,6 +12,7 @@ that should include the following members:
     - ircPort:      IRC port to connect to.
     - ircChannel:   IRC channel to join.
     - ircNickname:  IRC nickname.
+    - ircPassword:  IRC password (optional).
 
 The follwing methods are implemented:
 
@@ -60,7 +61,8 @@ var IRCClient = function(options) {
 
     self.socket.on('connect', function() {
         self.socket.emit('start', options.ircHost, options.ircPort,
-                                  options.ircChannel, options.ircNickname);
+                                  options.ircChannel, options.ircNickname,
+                                  options.ircPassword);
     });
 
     self.socket.on('join', function() {
@@ -114,11 +116,12 @@ var gnotty = function(options) {
 
     // Main setup function called when nickname is entered.
     // Creates IRC client and sets up event handlers.
-    var start = function(nickname) {
+    var start = function(nickname, password) {
 
         // Start the IRC client.
         joining = true;
         options.ircNickname = nickname;
+        options.ircPassword = password;
         client = new IRCClient(options);
 
         // Set up the loading animation.
@@ -158,8 +161,11 @@ var gnotty = function(options) {
         // once successfully joined.
         var joined = function() {
             $('.loading').modal('hide');
+            $('#password').hide();
+            $('#input').removeClass('nick').addClass('msg');
             $('#input').animate({width: '65%'}, function() {
                 $('#input').attr('placeholder', 'message');
+                $('#leave').fadeIn();
                 $('.hidden').slideDown(function() {
                     $('#submit').addClass('submit-joined').val('Send');
                     $('#messages').fadeIn();
@@ -238,7 +244,7 @@ var gnotty = function(options) {
         var value = $('#input').val();
         if (!joining && value) {
             if ($('.hidden').length > 0) {
-                start(value);
+                start(value, $('#password').val());
             } else {
                 client.message(value);
             }

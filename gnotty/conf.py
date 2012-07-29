@@ -32,6 +32,9 @@ options.add_option("-c", "--bot-class", dest="BOT_CLASS",
 options.add_option("-n", "--bot-nickname", dest="BOT_NICKNAME",
                   metavar="NICKNAME", default="gnotty",
                   help="IRC nickname the bot will use [default: %default]")
+options.add_option("-x", "--bot-password", dest="BOT_PASSWORD",
+                  metavar="PASSWORD", default="",
+                  help="Optional IRC password for the bot")
 options.add_option("-D", "--daemon", dest="DAEMON", action="store_true",
                   default=False,
                   help="run in daemon mode")

@@ -12,13 +12,14 @@ class BaseIRCClient(SimpleIRCClient, object):
     channel join. Currently only supports a single channel.
     """
 
-    def __init__(self, host, port, channel, nickname):
+    def __init__(self, host, port, channel, nickname, password):
         SimpleIRCClient.__init__(self)
         self.host = host
         self.port = int(port) if str(port).isdigit() else 6667
         self.channel = channel
         self.nickname = nickname
-        self.connect(self.host, self.port, self.nickname)
+        password = password or None
+        self.connect(self.host, self.port, self.nickname, password=password)
 
     def _dispatcher(self, connection, event):
         log = (event.eventtype(), self.nickname, "".join(event.arguments()))
@@ -62,10 +63,10 @@ class WebSocketIRCClient(BaseIRCClient):
     IRC client that's bridged with a gevent-socketio namespace.
     """
 
-    def __init__(self, host, port, channel, nickname, namespace):
+    def __init__(self, host, port, channel, nickname, password, namespace):
         self.nicknames = set()
         self.namespace = namespace
-        client_args = (host, port, channel, nickname)
+        client_args = (host, port, channel, nickname, password)
         super(WebSocketIRCClient, self).__init__(*client_args)
 
     def emit_message(self, message):

@@ -25,7 +25,7 @@ th {border-top:30px solid #fff !important;}
 .dropdown-menu a {text-align:right;}
 .chat {margin-top:5px; margin-bottom:0; padding:15px 0;}
 .chat input {margin-right:10px;}
-.hidden {display: none;}
+#leave {display: none;}
 
 .loading {margin-top:0; top:40%;}
 .progress {margin-bottom:0;}
@@ -34,8 +34,13 @@ th {border-top:30px solid #fff !important;}
 
 .powered {padding:10px 0; margin:0 10px; text-align:right;}
 
+@media (max-width:979px) {
+    .nick, #password {max-width:40%;}
+}
+
 @media (max-width: 767px) {
     body {margin-top:0;}
-    #input {max-width:55%;}
+    .nick, #password {max-width:32%;}
+    .msg {max-width:55%;}
     .navbar-fixed-top, .submit-joined, .powered {display:none !important;}
 }

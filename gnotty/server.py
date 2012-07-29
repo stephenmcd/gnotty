@@ -33,12 +33,13 @@ class IRCNamespace(BaseNamespace):
     gevent-socketio namespace that's bridged with an IRC client.
     """
 
-    def on_start(self, host, port, channel, nickname):
+    def on_start(self, host, port, channel, nickname, password):
         """
         A WebSocket session has started - create a greenlet to host
         the IRC client, and start it.
         """
-        self.client = WebSocketIRCClient(host, port, channel, nickname, self)
+        self.client = WebSocketIRCClient(host, port, channel, nickname,
+                                         password, self)
         self.spawn(self.client.start)
 
     def on_message(self, message):
@@ -69,7 +70,8 @@ class IRCApplication(object):
         __import__(module_name)
         bot_class = getattr(sys.modules[module_name], class_name)
         self.bot = bot_class(settings.IRC_HOST, settings.IRC_PORT,
-                             settings.IRC_CHANNEL, settings.BOT_NICKNAME)
+                             settings.IRC_CHANNEL, settings.BOT_NICKNAME,
+                             settings.BOT_PASSWORD)
         spawn(self.bot.start)
 
     def respond_webhook(self, environ):

@@ -15,8 +15,9 @@ browser. The web server uses `gevent <http://www.gevent.org>`_ and
 `WebSockets <http://en.wikipedia.org/wiki/WebSockets>`_, which provide
 the communication layer between the IRC channel and the web browser.
 Twitter's `Bootstrap <http://twitter.github.com/bootstrap/>`_ is used
-to style the web interface, with customisable templates provided for
-skinning.
+to style the web interface, providing a fully responsive layout
+suitable for use with mobile devices. Customisable templates are also
+provided for skinning the chat interface.
 
 Secondly, Gnotty provides the ability to run a highly customisable
 IRC bot. Different classes of bots can be configured on startup, and
@@ -77,6 +78,8 @@ Client" section below for details.
   * ``GNOTTY_BOT_NICKNAME`` - IRC nickname the logging client will
     use.
     *string, default: gnotty*
+  * ``GNOTTY_BOT_PASSWORD`` - Optional IRC password for the bot.
+    *string, default: None*
   * ``GNOTTY_DAEMON`` - run in daemon mode.
     *boolean, default: False*
   * ``GNOTTY_PID_FILE`` - path to write PID file to when in daemon
@@ -170,6 +173,9 @@ arguments to it::
       -n NICKNAME, --bot-nickname=NICKNAME
                             IRC nickname the bot will use
                             [default: gnotty]
+       -x PASSWORD, --bot-password=PASSWORD
+                            Optional IRC password for the bot
+                            [default: None]
       -D, --daemon          run in daemon mode
       -k, --kill            Shuts down a previously started daemon
       -F FILE_PATH, --pid-file=FILE_PATH
@@ -340,6 +346,7 @@ events out to the console::
         ircPort:      '6667',
         ircChannel:   '#gnotty',
         ircNickname:  prompt('Enter a nickname:')
+        ircPassword:  prompt('Enter a password (optional):')
     });
 
     // When the client first joins the IRC channel,
