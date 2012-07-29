@@ -19,6 +19,9 @@ to style the web interface, providing a fully responsive layout
 suitable for use with mobile devices. Customisable templates are also
 provided for skinning the chat interface.
 
+Check out the `Gnotty live demo <http://gnotty.jupo.org>`_ to see the
+web interface in action.
+
 Secondly, Gnotty provides the ability to run a highly customisable
 IRC bot. Different classes of bots can be configured on startup, and
 bots can perform different services such as message logging and
