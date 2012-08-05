@@ -1,4 +1,6 @@
 
+from datetime import datetime
+from inspect import getdoc, getargspec
 from json import loads
 from logging import Formatter, StreamHandler, INFO, getLogger
 from random import choice, randint
@@ -159,3 +161,183 @@ class BitBucketBot(CommitBot):
     def diff_url(self, payload):
         f, l = payload["commits"][0]["node"], payload["commits"][-1]["node"]
         return "%scompare/%s..%s" % (self.repo_url(payload), l, f)
+
+
+class CommandBot(BaseBot):
+
+    prefix_call = "!"
+    prefix_method = "on_command_"
+
+    def __init__(self, *args, **kwargs):
+        # Build the command dict - each method beginning
+        # with ``prefix_method``.
+        self.commands = dict([
+            (self.prefix_call + s[len(self.prefix_method):], getattr(self, s))
+            for s in dir(self) if s.startswith(self.prefix_method)
+        ])
+        self.joined = {}
+        self.quit = {}
+        super(CommandBot, self).__init__(*args, **kwargs)
+
+    def on_pubmsg(self, connection, event):
+        """
+        Check for a command on each new message, validates the
+        command's argument length, and runs the command returning
+        its result to the channel.
+        """
+        super(CommandBot, self).on_pubmsg(connection, event)
+        for message in event.arguments():
+            args = filter(None, message.split())
+            try:
+                command = self.commands[args.pop(0)]
+            except KeyError:
+                continue
+            argspec = getargspec(command)
+            num_all_args = len(argspec.args) - 2  # Ignore self/event args
+            num_pos_args = num_all_args - len(argspec.defaults or [])
+            if num_pos_args <= len(args) <= num_all_args:
+                response = command(event, *args)
+            elif num_all_args == num_pos_args:
+                s = "s are" if num_all_args != 1 else " is"
+                response = "%s arg%s required" % (num_all_args, s)
+            else:
+                bits = (num_pos_args, num_all_args)
+                response = "between %s and %s args are required" % bits
+            response = "%s: %s" % (self.get_nickname(event), response)
+            self.message_channel(response)
+
+    def on_namreply(self, connection, event):
+        """
+        Store join times for current nicknames when we first join.
+        """
+        nicknames = [s.lstrip("@+") for s in event.arguments()[-1].split()]
+        for nickname in nicknames:
+            self.joined[nickname] = datetime.now()
+
+    def on_join(self, connection, event):
+        """
+        Store join time for a nickname when it joins.
+        """
+        super(CommandBot, self).on_join(connection, event)
+        nickname = self.get_nickname(event)
+        self.joined[nickname] = datetime.now()
+
+    def on_quit(self, connection, event):
+        """
+        Store quit time for a nickname when it quits.
+        """
+        super(CommandBot, self).on_quit(connection, event)
+        nickname = self.get_nickname(event)
+        self.quit[nickname] = datetime.now()
+        del self.joined[nickname]
+
+    def timesince(self, when):
+        """
+        Returns human friendly version of the timespan between now
+        and the given datetime.
+        """
+        units = (
+            ("year",   60 * 60 * 24 * 365),
+            ("week",   60 * 60 * 24 * 7),
+            ("day",    60 * 60 * 24),
+            ("hour",   60 * 60),
+            ("minute", 60),
+            ("second", 1),
+        )
+        delta = datetime.now() - when
+        total_seconds = delta.days * 60 * 60 * 24 + delta.seconds
+        parts = []
+        for name, seconds in units:
+            value = total_seconds / seconds
+            if value > 0:
+                total_seconds %= seconds
+                s = "s" if value != 1 else ""
+                parts.append("%s %s%s" % (value, name, s))
+        return " and ".join(", ".join(parts).rsplit(", ", 1))
+
+    ##############
+    #  Commands  #
+    ##############
+
+    def on_command_version(self, event):
+        """
+        Shows version information.
+        """
+        return settings.GNOTTY_VERSION_STRING
+
+    def on_command_commands(self, event):
+        """
+        Lists all available commands.
+        """
+        commands = sorted(self.commands.keys())
+        return "Available commands: %s" % " ".join(commands)
+
+    def on_command_help(self, event, command_name=None):
+        """
+        Shows the help message for the bot. Takes an optional command name
+        which when given, will show help for that command.
+        """
+        if command_name is None:
+            return ("Type %scommands for a list of all commands. Type "
+                    "%shelp [command] to see help for a specific command." %
+                    (self.prefix_call, self.prefix_call))
+        try:
+            command = self.commands[command_name]
+        except KeyError:
+            return "%s is not a command" % command_name
+
+        argspec = getargspec(command)
+        args = argspec.args[2:]
+        defaults = argspec.defaults or []
+        for i in range(-1, -len(defaults) - 1, -1):
+            args[i] = "%s [default: %s]" % (args[i], defaults[i])
+        args = ", ".join(args)
+        help = getdoc(command).replace("\n", " ")
+        return "help for %s: (args: %s) %s" % (command_name, args, help)
+
+    def on_command_uptime(self, event, nickname=None):
+        """
+        Shows the amount of time since the given nickname has been
+        in the channel. If no nickname is given, I'll use my own.
+        """
+        if nickname and nickname != self.nickname:
+            try:
+                uptime = self.timesince(self.joined[nickname])
+            except KeyError:
+                return "%s is not in the channel" % nickname
+            else:
+                if nickname == self.get_nickname(event):
+                    prefix = "you have"
+                else:
+                    prefix = "%s has" % nickname
+                return "%s been here for %s" % (prefix, uptime)
+        uptime = self.timesince(self.joined[self.nickname])
+        return "I've been here for %s" % uptime
+
+    def on_command_seen(self, event, nickname):
+        """
+        Shows the amount of time since the given nickname was last
+        seen in the channel.
+        """
+        try:
+            self.joined[nickname]
+        except KeyError:
+            pass
+        else:
+            if nickname == self.get_nickname(event):
+                prefix = "you are"
+            else:
+                prefix = "%s is" % nickname
+            return "%s here right now" % prefix
+        try:
+            seen = self.timesince(self.quit[nickname])
+        except KeyError:
+            return "%s has never been seen" % nickname
+        else:
+            return "%s was last seen %s ago" % (nickname,  seen)
+
+    def on_command_users(self, event):
+        """
+        Shows the list of users currently in the channel.
+        """
+        return "Current users: %s" % ", ".join(sorted(self.joined.keys()))

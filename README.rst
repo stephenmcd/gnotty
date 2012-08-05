@@ -257,6 +257,9 @@ These are the built-in IRC bot classes provided by the
     `GitHub <http://github.com>`_
   * ``gnotty.bots.BitBucketBot`` - ``CommitBot`` subclass for
     `Bitbucket <http://bitbucket.org>`_
+  * ``gnotty.bots.CommandBot`` - A base bot class for running commands
+    issued by users in the channel. Each command is a method on the
+    bot class, named with the prefix ``on_command_``.
 
 Bot Webhooks
 ============
