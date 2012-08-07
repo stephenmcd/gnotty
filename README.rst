@@ -260,6 +260,13 @@ These are the built-in IRC bot classes provided by the
   * ``gnotty.bots.CommandBot`` - A base bot class for running commands
     issued by users in the channel. Each command is a method on the
     bot class, named with the prefix ``on_command_``.
+  * ``gnotty.bots.Voltron`` - All of the available bots, merged into
+    one `super bot <http://www.youtube.com/watch?v=tZZv5Z2Iz_s`_.
+
+Take a look at the source code for the ``gnotty.bots`` module. You'll
+see that the different features from all of the available bots are
+implemented as mixins, which you can mix and match together when
+building your own bot classes.
 
 Bot Webhooks
 ============

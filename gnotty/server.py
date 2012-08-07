@@ -5,7 +5,7 @@ from gevent import monkey, spawn
 monkey.patch_all()
 
 from cgi import FieldStorage
-from logging import getLogger, DEBUG, StreamHandler, Formatter
+from logging import getLogger, StreamHandler
 from mimetypes import guess_type
 import os
 import sys

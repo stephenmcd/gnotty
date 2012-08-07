@@ -2,7 +2,7 @@
 from datetime import datetime
 from inspect import getdoc, getargspec
 from json import loads
-from logging import Formatter, StreamHandler, INFO, getLogger
+from logging import Formatter, StreamHandler, getLogger
 from random import choice, randint
 
 from gevent import sleep
@@ -51,23 +51,24 @@ class BaseBot(BaseIRCClient):
             self.log(event, message)
 
     def on_webhook(self, environ, url, params):
-        raise NotImplementedError
+        if self.__class__ is BaseBot:
+            raise NotImplementedError
 
 
-class ChatBot(BaseBot):
+class ChatMixin(object):
     """
-    A demo bot that greets and responds to people.
+    Mixin for a chat bot that greets and responds to people.
     """
 
     def __init__(self, *args, **kwargs):
-        super(ChatBot, self).__init__(*args, **kwargs)
+        super(ChatMixin, self).__init__(*args, **kwargs)
         self.chatbots = []
         self.greetings = ("Hi", "Hello", "Howdy", "Welcome")
         try:
             from nltk.chat import bots
         except ImportError:
             from warnings import warn
-            warn("ChatBot requires nltk installed")
+            warn("ChatMixin requires nltk installed")
         else:
             get_bot = lambda x: x[0].func_globals["%sbot" % x[0].__name__]
             self.chatbots = map(get_bot, bots)
@@ -81,14 +82,14 @@ class ChatBot(BaseBot):
         self.message_channel(message)
 
     def on_join(self, connection, event):
-        super(ChatBot, self).on_join(connection, event)
+        super(ChatMixin, self).on_join(connection, event)
         nickname = self.get_nickname(event)
         greeting = choice(self.greetings)
         if nickname != self.nickname:
             self.message_channel_delayed("%s: %s" % (nickname, greeting))
 
     def on_pubmsg(self, connection, event):
-        super(ChatBot, self).on_pubmsg(connection, event)
+        super(ChatMixin, self).on_pubmsg(connection, event)
         if not self.chatbots:
             return
         for message in event.arguments():
@@ -100,24 +101,38 @@ class ChatBot(BaseBot):
                 self.message_channel_delayed("%s: %s" % (nickname, reply))
 
 
-class CommitBot(BaseBot):
+class CommitMixin(object):
     """
-    Base bot for GitHub/BitBucket post-push webhooks. Accepts the
-    webhook payload and writes out new commits and URLs to the
-    channel.
+    Mixin for DCVS post-push webhooks. Accepts the webhook payload and
+    writes out new commits and comparison URLs to the channel.
     """
 
     def on_webhook(self, environ, url, params):
+        super(CommitMixin, self).on_webhook(environ, url, params)
         payload = loads(params["payload"])
-        commit = lambda c: "%s - %s" % (c["message"], self.author(c))
+        # Welcome to crazy base class method dispatch for mixins!
+        # Get all our base classes that are subclasses of CommitMixin,
+        # create new instances of them, and if valid_payload matches
+        # for the instance, use its methods for building the messages
+        # to send to the channel.
+        for base in self.__class__.__bases__:
+            handler = base() if issubclass(base, CommitMixin) else None
+            if handler and handler.valid_payload(payload):
+                break
+        else:
+            return
+        commit = lambda c: "%s - %s" % (c["message"], handler.author(c))
         messages = [commit(c) for c in payload["commits"]]
         if len(messages) == 1:
-            messages[0] = "%s %s" % (messages[0], self.commit_url(commit))
+            messages[0] = "%s %s" % (messages[0], handler.commit_url(commit))
         else:
             messages.insert(0, "%s new commits:" % len(payload["commits"]))
-            messages.append("Compare view: %s" % self.diff_url(payload))
+            messages.append("Compare view: %s" % handler.diff_url(payload))
         for message in messages:
             self.message_channel(message)
+
+    def valid_payload(self, payload):
+        return False
 
     def author(self, commit):
         raise NotImplementedError
@@ -129,10 +144,13 @@ class CommitBot(BaseBot):
         raise NotImplementedError
 
 
-class GitHubBot(CommitBot):
+class GitHubMixin(CommitMixin):
     """
-    GitHub post-push webhook bot.
+    Mixin for GitHub post-push webhook bot.
     """
+
+    def valid_payload(self, payload):
+        return "github.com" in payload.get("compare", "")
 
     def author(self, commit):
         return commit["committer"]["name"]
@@ -144,10 +162,13 @@ class GitHubBot(CommitBot):
         return payload["compare"].replace("^", "")
 
 
-class BitBucketBot(CommitBot):
+class BitBucketMixin(CommitMixin):
     """
-    BitBucket post-push webhook bot.
+    Mixin for BitBucket post-push webhook bot.
     """
+
+    def valid_payload(self, payload):
+        return "bitbucket.org" in payload.get("canon_url", "")
 
     def repo_url(self, payload):
         return payload["canon_url"] + payload["repository"]["absolute_url"]
@@ -163,7 +184,13 @@ class BitBucketBot(CommitBot):
         return "%scompare/%s..%s" % (self.repo_url(payload), l, f)
 
 
-class CommandBot(BaseBot):
+class CommandMixin(BaseBot):
+    """
+    Mixin bot for running commands issued by users in the channel.
+    Each command is a method on the bot class, named with the
+    prefix defined by ``prefix_call`` and ``prefix_method``,
+    eg: ``on_command_foo`` becomes the command ``!foo``.
+    """
 
     prefix_call = "!"
     prefix_method = "on_command_"
@@ -177,7 +204,7 @@ class CommandBot(BaseBot):
         ])
         self.joined = {}
         self.quit = {}
-        super(CommandBot, self).__init__(*args, **kwargs)
+        super(CommandMixin, self).__init__(*args, **kwargs)
 
     def on_pubmsg(self, connection, event):
         """
@@ -185,7 +212,7 @@ class CommandBot(BaseBot):
         command's argument length, and runs the command returning
         its result to the channel.
         """
-        super(CommandBot, self).on_pubmsg(connection, event)
+        super(CommandMixin, self).on_pubmsg(connection, event)
         for message in event.arguments():
             args = filter(None, message.split())
             try:
@@ -218,7 +245,7 @@ class CommandBot(BaseBot):
         """
         Store join time for a nickname when it joins.
         """
-        super(CommandBot, self).on_join(connection, event)
+        super(CommandMixin, self).on_join(connection, event)
         nickname = self.get_nickname(event)
         self.joined[nickname] = datetime.now()
 
@@ -226,7 +253,7 @@ class CommandBot(BaseBot):
         """
         Store quit time for a nickname when it quits.
         """
-        super(CommandBot, self).on_quit(connection, event)
+        super(CommandMixin, self).on_quit(connection, event)
         nickname = self.get_nickname(event)
         self.quit[nickname] = datetime.now()
         del self.joined[nickname]
@@ -263,7 +290,8 @@ class CommandBot(BaseBot):
         """
         Shows version information.
         """
-        return settings.GNOTTY_VERSION_STRING
+        name = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
+        return "%s [%s]" % (settings.GNOTTY_VERSION_STRING, name)
 
     def on_command_commands(self, event):
         """
@@ -341,3 +369,26 @@ class CommandBot(BaseBot):
         Shows the list of users currently in the channel.
         """
         return "Current users: %s" % ", ".join(sorted(self.joined.keys()))
+
+
+##########################
+#  Concrete bot classes  #
+##########################
+
+class ChatBot(ChatMixin, BaseBot):
+    pass
+
+class GitHubBot(GitHubMixin, BaseBot):
+    pass
+
+class BitBucketBot(BitBucketMixin, BaseBot):
+    pass
+
+class CommitBot(GitHubMixin, BitBucketMixin, BaseBot):
+    pass
+
+class CommandBot(CommandMixin, BaseBot):
+    pass
+
+class Voltron(ChatMixin, GitHubMixin, BitBucketMixin, CommandMixin, BaseBot):
+    pass
