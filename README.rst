@@ -228,7 +228,7 @@ IRC Bots
 When running, Gnotty hosts an IRC bot that will connect to the
 configured IRC channel. The ``gnotty.bots.BaseBot`` bot is run by
 default, which implements message logging and support for commands
-issued within the IRC channel, and webhooks, which allows the IRC
+issued within the IRC channel, and webhooks, which allow the IRC
 bot to receive data over HTTP.
 
 You can implement your own IRC bot simply by subclassing
@@ -243,17 +243,18 @@ bot will have all of the same methods and events available as the
 ``SimpleIRCClient`` class.
 
 These are the built-in IRC bot classes provided by the
-``gnotty.bots`` module:
+``gnotty.bots`` package:
 
   * ``gnotty.bots.BaseBot`` - The default bot class that implements
-    logging and webhooks. Your custom bots should subclass this.
+    logging and handling for commands and webhooks. Your custom bot 
+    should subclass this.
   * ``gnotty.bots.ChatBot`` - A bot that demonstrates interacting with
     the IRC channel by greeting and responding to other users.
     Requires the ``nltk`` package to be installed.
-  * ``gnotty.bots.CommitMixin`` - A base bot mixin for receiving commit
-    information for version control systems via bot webhooks, and
-    relaying the commits to the IRC channel. Used as the base for the
-    ``GitHubBot`` and ``BitBucketBot`` classes.
+  * ``gnotty.bots.commits.CommitMixin`` - A base bot mixin for 
+    receiving commit information for version control systems via bot 
+    webhooks, and relaying the commits to the IRC channel. Used as the 
+    base for the ``GitHubBot`` and ``BitBucketBot`` bots.
   * ``gnotty.bots.GitHubBot`` - ``CommitMixin`` subclass for
     `GitHub <http://github.com>`_
   * ``gnotty.bots.BitBucketBot`` - ``CommitMixin`` subclass for
@@ -261,7 +262,7 @@ These are the built-in IRC bot classes provided by the
   * ``gnotty.bots.CommandBot`` - A bot that implements a handlful
     of basic commands that can be issued by users in the channel.
   * ``gnotty.bots.Voltron`` - All of the available bots, merged into
-    one `super bot <http://www.youtube.com/watch?v=tZZv5Z2Iz_s`_.
+    one `super bot <http://www.youtube.com/watch?v=tZZv5Z2Iz_s>`_.
 
 Take a look at the source code for the ``gnotty.bots`` package. You'll
 see that the different features from all of the available bots are
@@ -325,8 +326,8 @@ As described above, each of the IRC server events implemented by the
 ``irclib`` package's ``irc.client.SimpleIRCClient`` class are available
 as event handlers for an IRC bot. Consult the ``irclib`` docs or source
 code for details about each of the IRC server events that are implemented,
-as documenting these are beyond the scope of this document. Here are some
-of the common events to get you started:
+as documenting all of these is beyond the scope of this document. Here 
+are some of the common events to get you started:
 
   - ``events.on("welcome")``: Bot has connected to the server but not yet
     joined the channel.
