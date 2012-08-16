@@ -1,6 +1,6 @@
 
 from datetime import datetime
-from inspect import getdoc, getargspec, stack
+from inspect import getdoc, getargspec
 
 from gnotty.bots import events
 from gnotty.conf import settings
