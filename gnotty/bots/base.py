@@ -50,7 +50,7 @@ class BaseBot(BaseIRCClient):
         get passed through. Here we map events to our own custom
         event handlers, and call them.
         """
-        super(BaseIRCClient, self)._dispatcher(connection, event)
+        super(BaseBot, self)._dispatcher(connection, event)
         for handler in self.events[event.eventtype()]:
             handler(self, connection, event)
 
