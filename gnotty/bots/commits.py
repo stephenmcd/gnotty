@@ -79,9 +79,9 @@ class BitBucketPayload(CommitPayload):
     Mixin for Bitbucket post-push webhook bot.
     """
 
-    def repo_url(self):
-        host = self.payload["canon_url"]
-        return "%s%s" % (host, self.payload["repository"]["absolute_url"])
+    def repo_url(self, payload):
+        host = payload["canon_url"]
+        return "%s%s" % (host, payload["repository"]["absolute_url"])
 
     def author(self, commit):
         return commit["raw_author"].split("<")[0]
