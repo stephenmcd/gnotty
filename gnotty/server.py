@@ -70,7 +70,7 @@ class IRCApplication(object):
         __import__(module_name)
         bot_class = getattr(sys.modules[module_name], class_name)
         self.bot = bot_class(settings.IRC_HOST, settings.IRC_PORT,
-                             settings.IRC_CHANNEL, settings.IRC_CHANNEL_KEY, settings.BOT_NICKNAME,
+                             settings.IRC_CHANNEL, settings.BOT_NICKNAME,
                              settings.BOT_PASSWORD)
         spawn(self.bot.start)
 

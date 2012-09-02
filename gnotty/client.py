@@ -12,12 +12,11 @@ class BaseIRCClient(SimpleIRCClient, object):
     channel join. Currently only supports a single channel.
     """
 
-    def __init__(self, host, port, channel, channel_key, nickname, password):
+    def __init__(self, host, port, channel, nickname, password):
         SimpleIRCClient.__init__(self)
         self.host = host
         self.port = int(port) if str(port).isdigit() else 6667
         self.channel = channel
-        self.channel_key = channel_key
         self.nickname = nickname
         password = password or None
         self.connect(self.host, self.port, self.nickname, password=password)
@@ -37,7 +36,7 @@ class BaseIRCClient(SimpleIRCClient, object):
         """
         Join the channel once connected to the IRC server.
         """
-        connection.join(self.channel, key=self.channel_key)
+        connection.join(self.channel, key=settings.IRC_CHANNEL_KEY or "")
 
     def on_nicknameinuse(self, connection, event):
         """
