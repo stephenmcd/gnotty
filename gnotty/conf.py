@@ -25,8 +25,8 @@ options.add_option("-C", "--irc-channel", dest="IRC_CHANNEL",
                   metavar="CHANNEL", default="#gnotty",
                   help="IRC channel to join [default: %default]")
 options.add_option("-K", "--irc-channel-key", dest="IRC_CHANNEL_KEY",
-                  metavar="CHANNELKEY", default="",
-                  help="IRC channel to join [default: %default]")
+                  metavar="CHANNEL_KEY", default="",
+                  help="Optional key required to access the IRC channel")
 options.add_option("-c", "--bot-class", dest="BOT_CLASS",
                   metavar="DOTTED_PYTHON_PATH",
                   default="gnotty.bots.BaseBot",

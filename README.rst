@@ -78,6 +78,9 @@ Client" section below for details.
     *integer, default: 6667*
   * ``GNOTTY_IRC_CHANNEL`` - IRC channel to join.
     *string, default: #gnotty*
+  * ``GNOTTY_IRC_CHANNEL_KEY`` - Optional key required to access
+    the IRC channel.
+    *string, default: None*
   * ``GNOTTY_BOT_CLASS`` - Dotted Python path to the IRC client bot
     class to run.
     *string, default: gnotty.bots.BaseBot*
@@ -180,6 +183,8 @@ arguments to it::
       -C CHANNEL, --irc-channel=CHANNEL
                             IRC channel to join
                             [default: #gnotty]
+      -K CHANNEL_KEY, --irc-channel-key=CHANNEL_KEY
+                            Optional key required to access the IRC channel
       -c DOTTED_PYTHON_PATH, --bot-class=DOTTED_PYTHON_PATH
                             Dotted Python path to the IRC client bot class to run
                             [default: gnotty.bots.LoggingBot]
@@ -246,14 +251,14 @@ These are the built-in IRC bot classes provided by the
 ``gnotty.bots`` package:
 
   * ``gnotty.bots.BaseBot`` - The default bot class that implements
-    logging and handling for commands and webhooks. Your custom bot 
+    logging and handling for commands and webhooks. Your custom bot
     should subclass this.
   * ``gnotty.bots.ChatBot`` - A bot that demonstrates interacting with
     the IRC channel by greeting and responding to other users.
     Requires the ``nltk`` package to be installed.
-  * ``gnotty.bots.commits.CommitMixin`` - A base bot mixin for 
-    receiving commit information for version control systems via bot 
-    webhooks, and relaying the commits to the IRC channel. Used as the 
+  * ``gnotty.bots.commits.CommitMixin`` - A base bot mixin for
+    receiving commit information for version control systems via bot
+    webhooks, and relaying the commits to the IRC channel. Used as the
     base for the ``GitHubBot`` and ``BitBucketBot`` bots.
   * ``gnotty.bots.GitHubBot`` - ``CommitMixin`` subclass for
     `GitHub <http://github.com>`_
@@ -326,7 +331,7 @@ As described above, each of the IRC server events implemented by the
 ``irclib`` package's ``irc.client.SimpleIRCClient`` class are available
 as event handlers for an IRC bot. Consult the ``irclib`` docs or source
 code for details about each of the IRC server events that are implemented,
-as documenting all of these is beyond the scope of this document. Here 
+as documenting all of these is beyond the scope of this document. Here
 are some of the common events to get you started:
 
   - ``events.on("welcome")``: Bot has connected to the server but not yet
