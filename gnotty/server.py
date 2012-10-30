@@ -157,7 +157,7 @@ class IRCApplication(object):
         """
         return 401
 
-    def unauthorized(self, environ):
+    def authorized(self, environ):
         """
         If we're running Django and ``GNOTTY_LOGIN_REQUIRED`` is set
         to ``True``, pull the session cookie from the environment and
@@ -177,19 +177,19 @@ class IRCApplication(object):
                 user_id = session.get_decoded().get(SESSION_KEY)
                 user = User.objects.get(id=user_id)
             except (ImportError, KeyError, ObjectDoesNotExist):
-                return True
-        return False
+                return False
+        return True
 
     def __call__(self, environ, start_response):
         """
         WSGI application handler.
         """
-        unauthorized = self.unauthorized(environ)
+        authorized = self.authorized(environ)
         path = environ["PATH_INFO"]
-        if path.startswith("/socket.io/") and not unauthorized:
+        if path.startswith("/socket.io/") and authorized:
             socketio_manage(environ, {"": IRCNamespace})
             return
-        if unauthorized:
+        if not authorized:
             dispatch = self.respond_unauthorized
         elif path.startswith("/webhook/"):
             dispatch = self.respond_webhook
