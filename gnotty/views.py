@@ -2,6 +2,7 @@
 from calendar import Calendar, SUNDAY
 from datetime import datetime, date
 
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render, redirect
 
@@ -72,3 +73,9 @@ def calendar(request, year=None, month=None, template="gnotty/calendar.html"):
     context = dict(settings)
     context["months"] = months
     return render(request, template, context)
+
+
+if settings.LOGIN_REQUIRED:
+    chat     = login_required(chat)
+    messages = login_required(messages)
+    calendar = login_required(calendar)

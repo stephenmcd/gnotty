@@ -38,6 +38,9 @@ options.add_option("-n", "--bot-nickname", dest="BOT_NICKNAME",
 options.add_option("-x", "--bot-password", dest="BOT_PASSWORD",
                   metavar="PASSWORD", default="",
                   help="Optional IRC password for the bot")
+options.add_option("-L", "--login-required", dest="LOGIN_REQUIRED",
+                  action="store_true", default=False,
+                  help="Django login required for all URLs (Django only)")
 options.add_option("-D", "--daemon", dest="DAEMON", action="store_true",
                   default=False,
                   help="run in daemon mode")

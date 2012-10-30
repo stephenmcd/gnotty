@@ -89,6 +89,9 @@ Client" section below for details.
     *string, default: gnotty*
   * ``GNOTTY_BOT_PASSWORD`` - Optional IRC password for the bot.
     *string, default: None*
+  * ``GNOTTY_LOGIN_REQUIRED`` - Django login required for all URLs
+    (Django only)
+    *boolean, default: False*
   * ``GNOTTY_DAEMON`` - run in daemon mode.
     *boolean, default: False*
   * ``GNOTTY_PID_FILE`` - path to write PID file to when in daemon

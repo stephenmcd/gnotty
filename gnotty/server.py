@@ -4,6 +4,7 @@ from __future__ import with_statement
 from gevent import monkey, spawn
 monkey.patch_all()
 
+from Cookie import Cookie
 from cgi import FieldStorage
 from logging import getLogger, StreamHandler
 from mimetypes import guess_type
@@ -23,6 +24,7 @@ from gnotty.conf import settings
 HTTP_STATUS_TEXT = {
     200: "OK",
     301: "MOVED PERMANENTLY",
+    401: "UNAUTHORIZED",
     404: "NOT FOUND",
     500: "INTERNAL SERVER ERROR",
 }
@@ -147,15 +149,49 @@ class IRCApplication(object):
             "%(SERVER_NAME)s%(port)s%(PATH_INFO)s") % environ
         return (301, [("Location", location)], None)
 
+    def respond_unauthorized(self, environ):
+        """
+        Just return unauthorized HTTP status if the
+        ``unauthorized`` method returns ``True`` inside
+        ``__call__``.
+        """
+        return 401
+
+    def unauthorized(self, environ):
+        """
+        If we're running Django and ``GNOTTY_LOGIN_REQUIRED`` is set
+        to ``True``, pull the session cookie from the environment and
+        validate that the user is authenticated.
+        """
+        if self.django and settings.LOGIN_REQUIRED:
+            try:
+                from django.conf import settings as django_settings
+                from django.contrib.auth import SESSION_KEY
+                from django.contrib.auth.models import User
+                from django.contrib.sessions.models import Session
+                from django.core.exceptions import ObjectDoesNotExist
+                cookie = Cookie(environ["HTTP_COOKIE"])
+                cookie_name = django_settings.SESSION_COOKIE_NAME
+                session_key = cookie[cookie_name].value
+                session = Session.objects.get(session_key=session_key)
+                user_id = session.get_decoded().get(SESSION_KEY)
+                user = User.objects.get(id=user_id)
+            except (ImportError, KeyError, ObjectDoesNotExist):
+                return True
+        return False
+
     def __call__(self, environ, start_response):
         """
         WSGI application handler.
         """
+        unauthorized = self.unauthorized(environ)
         path = environ["PATH_INFO"]
-        if path.startswith("/socket.io/"):
+        if path.startswith("/socket.io/") and not unauthorized:
             socketio_manage(environ, {"": IRCNamespace})
             return
-        if path.startswith("/webhook/"):
+        if unauthorized:
+            dispatch = self.respond_unauthorized
+        elif path.startswith("/webhook/"):
             dispatch = self.respond_webhook
         elif self.django:
             dispatch = self.respond_django
