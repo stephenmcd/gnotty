@@ -43,6 +43,7 @@ be run without using Django at all, as a stand-alone gevent web
 server that provides the web interface to an IRC channel, with
 configurable IRC bots.
 
+
 Installation
 ============
 
@@ -57,6 +58,7 @@ Otherwise you can obtain Gnotty from the
 and install it directly from source::
 
     $ python setup.py install
+
 
 Configuration
 =============
@@ -105,6 +107,7 @@ To be clear: the IRC host and port are for specifying the IRC server
 to connect to. The HTTP host and port are what will be used to host
 the gevent/WebSocket server.
 
+
 Django Integration
 ==================
 
@@ -151,6 +154,7 @@ formats used in this context are the same as those described next for
 the stand-alone web client. Any options provided as command-line
 arguments take precendence over those defined in your Django project's
 ``settings.py`` module.
+
 
 Stand-Alone Web Client
 ======================
@@ -214,6 +218,7 @@ the settings described earlier. Any options provided via command-line
 arguments will take precedence over any options defined in the Python
 configuration module.
 
+
 Daemon Mode
 ===========
 
@@ -229,6 +234,7 @@ system's location for temporary files.
 When run in daemon mode, Gnotty will check for an existing PID file
 and if found, will attempt to shut down a previously started server
 with the same PID file.
+
 
 IRC Bots
 ========
@@ -276,6 +282,7 @@ Take a look at the source code for the ``gnotty.bots`` package. You'll
 see that the different features from all of the available bots are
 implemented as mixins, which you can mix and match together when
 building your own bot classes.
+
 
 Bot Events
 ==========
@@ -327,6 +334,7 @@ Gnotty can be started with the bot using the following arguments::
 
   $ gnottify --http-host=127.0.0.1 --http-port=8000 --bot-class=my_bot.MyBot
 
+
 Server Events
 =============
 
@@ -349,6 +357,7 @@ Each of the server events receive a ``connection`` and ``event`` argument,
 which are objects for the connection to the IRC server, and information
 about the event that occurred.
 
+
 Command Events
 ==============
 
@@ -361,6 +370,7 @@ message after the command is then passed as a separate argument to the
 event handler method for the command. In each command event handler method,
 the bot can then perform some task, and return a message back to the
 channel.
+
 
 Webhook Events
 ==============
@@ -385,6 +395,7 @@ the following arguments:
 Note that the ``url`` and ``params`` arguments are simply provided for
 extra convenience, as their values (and all other environment
 information) are already available via the ``environ`` argument.
+
 
 Message Logging
 ===============
@@ -413,6 +424,7 @@ Here's an example of adding an extra logging handler for IRC messages::
           print record.msg
 
   getLogger("irc.message").addHandler(MyLogHandler())
+
 
 JavaScript Client
 =================
@@ -486,3 +498,37 @@ events out to the console::
 As you may have guessed, the server-side settings configured for
 Gnotty are passed directly into the ``gnotty`` JavaScript function,
 which then creates its own ``IRCClient`` instance.
+
+
+Hosting Private Chat Rooms
+==========================
+
+Creating a private login-protected chat room for your team members
+to collaborate on is a breeze using Gnotty. By setting the
+``GNOTTY_LOGIN_REQUIRED`` setting to ``True``, Gnotty will require
+each user to have a Django user account which they can authenticate
+with. The following steps should get you started:
+
+  * Create a Django project with Gnotty installed, using the steps
+    described above under `Django Integration`.
+  * Add `django-registration` to your Django project, which will
+    add sign-up and login pages to your project.
+  * Install an IRC server such as `ngIRCd`. ngIRCd can be installed
+    on both Linux or OSX with a single command (this works great for
+    local development on OSX). Be sure to configure ngIRCd to only
+    allow local connections, so that only Gnotty can connect to it.
+
+With the above setup, all that is then needed are the following
+Gnotty settings configured in your Django project's ``settings.py``
+module:
+
+    GNOTTY_IRC_HOST = "127.0.0.1"
+    GNOTTY_LOGIN_REQUIRED = True
+    GNOTTY_IRC_CHANNEL = "#mychannel"  # This can be anything really.
+
+More information for each of the above steps can be found in the
+documentation for each of the various projects:
+
+  * django project
+  * django registration
+  * ngIRCd
