@@ -273,7 +273,7 @@ These are the built-in IRC bot classes provided by the
     `GitHub <http://github.com>`_
   * ``gnotty.bots.BitBucketBot`` - ``CommitMixin`` subclass for
     `Bitbucket <http://bitbucket.org>`_
-  * ``gnotty.bots.CommandBot`` - A bot that implements a handlful
+  * ``gnotty.bots.CommandBot`` - A bot that implements a handful
     of basic commands that can be issued by users in the channel.
   * ``gnotty.bots.Voltron`` - All of the available bots, merged into
     one `super bot <http://www.youtube.com/watch?v=tZZv5Z2Iz_s>`_.
@@ -520,7 +520,7 @@ with. The following steps should get you started:
 
 With the above setup, all that is then needed are the following
 Gnotty settings configured in your Django project's ``settings.py``
-module:
+module::
 
     GNOTTY_IRC_HOST = "127.0.0.1"
     GNOTTY_LOGIN_REQUIRED = True
@@ -529,6 +529,6 @@ module:
 More information for each of the above steps can be found in the
 documentation for each of the various projects:
 
-  * django project
-  * django registration
-  * ngIRCd
+  * `Django <https://docs.djangoproject.com/en/dev/intro/install/>`_
+  * `django-registration <http://django-registration.readthedocs.org/>`_
+  * `ngIRCd <http://ngircd.barton.de/>`_
