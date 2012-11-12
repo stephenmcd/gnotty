@@ -253,6 +253,16 @@ var gnotty = function(options) {
         return false;
     });
 
+    // Wat. Enter key stops triggering the above form submit if the
+    // submit button is not visible via media queries on small
+    // devices, so we need to trigger it manually here.
+    $('#input').keypress(function(e) {
+        if (e.keyCode == 13) {
+            $('.chat').submit();
+            return false;
+        }
+    });
+
     // Join if there's a nickname in the querystring.
     var parts = location.href.split('?nickname=');
     if (parts.length == 2) {
