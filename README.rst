@@ -510,13 +510,14 @@ each user to have a Django user account which they can authenticate
 with. The following steps should get you started:
 
   * Create a Django project with Gnotty installed, using the steps
-    described above under `Django Integration`.
-  * Add `django-registration` to your Django project, which will
-    add sign-up and login pages to your project.
-  * Install an IRC server such as `ngIRCd`. ngIRCd can be installed
-    on both Linux or OSX with a single command (this works great for
-    local development on OSX). Be sure to configure ngIRCd to only
-    allow local connections, so that only Gnotty can connect to it.
+    described above under `Django Integration`. Take a look at the
+    ``example_project`` directory within Gnotty, which contains a
+    working Django project with Gnotty configured.
+  * Install an IRC server such as `ngIRCd <http://ngircd.barton.de/>`_.
+    ngIRCd can be installed on both Linux or OSX with a single command
+    (this works great for local development on OSX). Be sure to
+    configure ngIRCd to only allow local connections, so that only
+    Gnotty can connect to it.
 
 With the above setup, all that is then needed are the following
 Gnotty settings configured in your Django project's ``settings.py``
@@ -525,10 +526,3 @@ module::
     GNOTTY_IRC_HOST = "127.0.0.1"
     GNOTTY_LOGIN_REQUIRED = True
     GNOTTY_IRC_CHANNEL = "#mychannel"  # This can be anything really.
-
-More information for each of the above steps can be found in the
-documentation for each of the various projects:
-
-  * `Django <https://docs.djangoproject.com/en/dev/intro/install/>`_
-  * `django-registration <http://django-registration.readthedocs.org/>`_
-  * `ngIRCd <http://ngircd.barton.de/>`_

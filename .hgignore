@@ -5,3 +5,5 @@ syntax: glob
 build
 dist
 *.egg-info
+*.db
+local_settings.py

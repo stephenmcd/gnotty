@@ -2,7 +2,9 @@
 from calendar import Calendar, SUNDAY
 from datetime import datetime, date
 
+from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from django.contrib.messages import info, error
 from django.db.models import Q
 from django.shortcuts import render, redirect
 
@@ -79,3 +81,20 @@ if settings.LOGIN_REQUIRED:
     chat     = login_required(chat)
     messages = login_required(messages)
     calendar = login_required(calendar)
+
+
+def login(request):
+    if request.method == "POST":
+        user = auth.authenticate(username=request.POST["username"],
+                                 password=request.POST["password"])
+        if user:
+            auth.login(request, user)
+            return redirect(request.GET.get("next", "/"))
+        error(request, "Invalid username/password")
+    return render(request, "gnotty/login.html", {"request": request})
+
+
+def logout(request):
+    auth.logout(request)
+    info(request, "You have successfully logged out")
+    return redirect("/")

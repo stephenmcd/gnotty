@@ -8,7 +8,10 @@
 <div class="nav-collapse">
 
     <form action="{% url gnotty_search %}" class="navbar-search pull-right">
-        <input class="search-query" required placeholder="Search" type="text" name="q" value="{{ request.GET.q }}">
+        <input required placeholder="Search" type="text" name="q" value="{{ request.GET.q }}">
+        {% if request.user.is_authenticated %}
+        <a class="btn btn-small logout" href="{{ LOGOUT_URL }}">Logout</a>
+        {% endif %}
     </form>
 
     {% if years %}

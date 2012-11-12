@@ -1,5 +1,6 @@
 
 from django import template
+from django.conf import settings as django_settings
 from django.db.models import Min, Max
 
 from gnotty.models import IRCMessage
@@ -20,4 +21,5 @@ def gnotty_nav(context):
         years = []
     context["IRC_CHANNEL"] = settings.IRC_CHANNEL
     context["years"] = years
+    context["LOGOUT_URL"] = django_settings.LOGOUT_URL
     return context

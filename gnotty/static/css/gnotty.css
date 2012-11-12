@@ -32,6 +32,8 @@ th {border-top:30px solid #fff !important;}
 .bar {width:1px;}
 .modal-backdrop {background:#fff;}
 
+.logout {margin:-5px 0 0 5px !important;}
+
 .powered {padding:10px 0; margin:0 10px; text-align:right;}
 
 @media (max-width:979px) {

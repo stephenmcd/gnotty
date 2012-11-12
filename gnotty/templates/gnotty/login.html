@@ -1,0 +1,25 @@
+{% extends "gnotty/base.html" %}
+{% block content %}
+
+<style>
+.nav-collapse, footer {display:none;}
+.login {margin:40px 0;}
+.login input {margin-right:10px;}
+.login .btn {margin-top:-10px;}
+.error {color:#f00;}
+</style>
+
+<h1>Login</h1>
+
+<form method="post" class="login">
+    {% csrf_token %}
+    <input type="text" required placeholder="username" name="username" value="{{ request.POST.username }}">
+    <input type="password" required placeholder="password" name="password">
+    <input type="submit" class="btn btn-primary" value="Login">
+</form>
+
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}" data-alert="alert">{{ message }}</div>
+{% endfor %}
+
+{% endblock %}
