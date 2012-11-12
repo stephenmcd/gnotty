@@ -1,5 +1,5 @@
 
-body {margin:65px 0;}
+body {margin:70px 0 65px 0;}
 .navbar-fixed-top {position:fixed !important;}
 .navbar-fixed-top, .navbar-inner {padding:0 !important;}
 
@@ -41,7 +41,7 @@ th {border-top:30px solid #fff !important;}
 }
 
 @media (max-width: 767px) {
-    body {margin-top:0;}
+    body {margin-top:30px;}
     .nick, #password {max-width:32%;}
     .msg {max-width:55%;}
     .navbar-fixed-top, .submit-joined, .powered {display:none !important;}
