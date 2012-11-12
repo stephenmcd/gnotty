@@ -42,6 +42,13 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
 )
 
+try:
+    import south
+except ImportError:
+    pass
+else:
+    INSTALLED_APPS += ("south",)
+
 
 ###################
 # Gnotty settings #
