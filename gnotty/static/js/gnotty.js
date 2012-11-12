@@ -285,4 +285,12 @@ var gnotty = function(options) {
     // Focus the main input box on first load.
     $('#input').val('').focus();
 
+    // Only add the password field when we're on the actual chat
+    // interface, since having it in the archive interfaces
+    // would result in the password being put into the
+    // querystring when the join form is submitted regularly.
+    $('#input').after('<input type="password" class="input-xlarge" ' +
+                      'id="password" placeholder="password (optional)" ' +
+                      'name="password" autocomplete="off">');
+
 };
