@@ -36,7 +36,7 @@ class BaseIRCClient(SimpleIRCClient, object):
         """
         Join the channel once connected to the IRC server.
         """
-        connection.join(self.channel, key=settings.IRC_CHANNEL_KEY)
+        connection.join(self.channel, key=settings.IRC_CHANNEL_KEY or "")
 
     def on_nicknameinuse(self, connection, event):
         """
