@@ -9,7 +9,7 @@ footer {position:fixed; left:0; bottom:0; background:#ddd; width:100%;
 table {margin-top:-15px;}
 th {border-top:30px solid #fff !important;}
 .calendar th, .calendar td {text-align:center;}
-.calendar .not-in-month {color:#ddd;}
+.calendar .not-in-month, .calendar .not-in-month a {color:#ddd;}
 .calendar a {font-weight:bold; text-decoration:underline;}
 
 .main-chat {display:none;}
