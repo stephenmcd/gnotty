@@ -22,7 +22,8 @@ class BaseIRCClient(SimpleIRCClient, object):
         self.connect(self.host, self.port, self.nickname, password=password)
 
     def _dispatcher(self, connection, event):
-        log = (event.eventtype(), self.nickname, "".join(event.arguments()))
+        event_args = "".join(event.arguments()).decode("utf-8")
+        log = (event.eventtype(), self.nickname, event_args)
         getLogger("irc.dispatch").debug("%s: [%s] %s" % log)
         SimpleIRCClient._dispatcher(self, connection, event)
 
