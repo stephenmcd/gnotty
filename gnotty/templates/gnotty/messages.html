@@ -37,7 +37,7 @@ if (!location.hash) {
     {% endif %}
     <td>{{ message.message_time|date:"H:i:s" }}</td>
     <td>{{ message.nickname }}</td>
-    <td class="message">{{ message.short_message }}</td>
+    <td class="message">{{ message.message }}</td>
 </tr>
 {% endwith %}
 {% empty %}
