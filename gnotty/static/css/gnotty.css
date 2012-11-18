@@ -15,7 +15,9 @@ th {border-top:30px solid #fff !important;}
 .main-chat {display:none;}
 .main-chat a {text-decoration:underline;}
 .message {width:100%;}
-#messages td, .nickname {font-family:Menlo,Monaco,'Courier New',monospace; border:0;}
+#messages td, .nickname {border:0;}
+#messages .time {color:#888; font-size:12px;}
+#messages .nickname {text-align:right;}
 .message-highlighted td {background:#ffc !important;}
 
 #nicknames {margin-bottom:0;}
@@ -44,5 +46,5 @@ th {border-top:30px solid #fff !important;}
     body {margin-top:30px;}
     .nick, #password {max-width:32%;}
     .msg {max-width:55%;}
-    .navbar-fixed-top, .submit-joined, .powered {display:none !important;}
+    .nicknames-row, .navbar-fixed-top, .submit-joined, .powered {display:none !important;}
 }

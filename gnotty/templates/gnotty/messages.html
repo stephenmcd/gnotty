@@ -35,8 +35,8 @@ if (!location.hash) {
     {% if request.GET.q %}
     <td><a class="btn btn-mini btn-primary" href="{{ message.get_absolute_url }}?id={{ message.id }}">View</a></td>
     {% endif %}
-    <td>{{ message.message_time|date:"H:i:s" }}</td>
-    <td>{{ message.nickname }}</td>
+    <td class="time">[{{ message.message_time|date:"H:i:s" }}]</td>
+    <td class="nickname">{{ message.nickname }}:</td>
     <td class="message">{{ message.message }}</td>
 </tr>
 {% endwith %}
