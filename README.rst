@@ -155,6 +155,9 @@ the stand-alone web client. Any options provided as command-line
 arguments take precendence over those defined in your Django project's
 ``settings.py`` module.
 
+The ``gnottify_runserver`` command is also included, which will run
+both the Gnotty server and Django's ``runserver`` command at once,
+which is useful during development.
 
 Stand-Alone Web Client
 ======================
