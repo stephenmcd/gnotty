@@ -54,7 +54,6 @@ else:
 # Gnotty settings #
 ###################
 
-GNOTTY_HTTP_HOST = '127.0.0.1'
 GNOTTY_HTTP_PORT = 8080
 GNOTTY_IRC_HOST = '127.0.0.1'
 GNOTTY_IRC_PORT = 6667
@@ -77,3 +76,4 @@ except ImportError:
 
 TEMPLATE_DEBUG = DEBUG
 GNOTTY_LOG_LEVEL = 'DEBUG' if DEBUG else 'INFO'
+GNOTTY_HTTP_HOST = '127.0.0.1' if DEBUG else '0.0.0.0'
