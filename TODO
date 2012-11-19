@@ -1,2 +1,4 @@
 * Multiple channels
 * Tests
+* DCC send in the browser
+* Persistent IRC session (close browser without disconnecting)
