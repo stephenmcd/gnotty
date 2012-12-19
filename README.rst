@@ -278,6 +278,8 @@ These are the built-in IRC bot classes provided by the
     `Bitbucket <http://bitbucket.org>`_
   * ``gnotty.bots.CommandBot`` - A bot that implements a handful
     of basic commands that can be issued by users in the channel.
+  * ``gnotty.bots.RSSBot`` - A bot that watches RSS feeds and posts
+    new items from them to the IRC channel.
   * ``gnotty.bots.Voltron`` - All of the available bots, merged into
     one `super bot <http://www.youtube.com/watch?v=tZZv5Z2Iz_s>`_.
 
@@ -294,8 +296,8 @@ Gnotty's IRC bots make use of an event handling system. Event handlers
 are implemented as methods on any of the classes used to build a bot.
 Each event handler gets wrapped with the decorator
 ``gnotty.bots.events.on``, which takes an initial event name argument,
-and marks the method as being a handler for that event. Three types of
-events are available:
+and marks the method as being a handler for that event. Several types
+of events are available:
 
   * IRC server events, as implemented by the ``irclib`` package's
     ``irc.client.SimpleIRCClient`` class.
@@ -303,12 +305,14 @@ events are available:
     users in the IRC channel, and take a second argument to the
     ``gnotty.bots.events.on`` decorator, which specifies the command
     name.
+  * Timer events, which are handlers that are periodically run at a
+    defined time interval.
   * Webhooks, which are handlers that accept data over HTTP, and also
     take a second argument to the ``gnotty.bots.events.on`` decorator,
     which specifies URL to match with a regular expression, similar to
     Django's ``urlpatterns``.
 
-Here's an example IRC bot that implements all three types of events::
+Here's an example IRC bot that implements all the above event types::
 
   from gnotty.bots import BaseBot, events
 
@@ -320,17 +324,23 @@ Here's an example IRC bot that implements all three types of events::
           nickname = self.get_nickname(event)
           self.message_channel("Hello %s" nickname)
 
-      @events.on("webhook", "^/webhook/do/something/$")
-      def my_webhook_handler(self, environ, url, params):
-          """Tell the channel that someone hit the webhook URL."""
-          ip = environ["REMOTE_ADDR"]
-          self.message_channel("The IP %s hit the URL %s" (ip, url))
+      @events.on("timer", 10)
+      def my_timer(self):
+          """Do something every 10 seconds."""
+          msg = "Another 10 seconds has passed, are you annoyed yet?"
+          self.message_channel(msg)
 
       @events.on("command", "!time")
       def my_time_command(self, connection, event):
           """Write the time to the channel when someone types !time"""
           from datetime import datetime
           return "The date and time is %s" % datetime.now()
+
+      @events.on("webhook", "^/webhook/do/something/$")
+      def my_webhook_handler(self, environ, url, params):
+          """Tell the channel that someone hit the webhook URL."""
+          ip = environ["REMOTE_ADDR"]
+          self.message_channel("The IP %s hit the URL %s" (ip, url))
 
 Given the above class in an importable Python module named ``my_bot.py``,
 Gnotty can be started with the bot using the following arguments::
@@ -373,6 +383,20 @@ message after the command is then passed as a separate argument to the
 event handler method for the command. In each command event handler method,
 the bot can then perform some task, and return a message back to the
 channel.
+
+
+Timer Events
+============
+
+These event handlers are defined using the ``timer`` event name for the
+``gnotty.bots.events.on`` decorator, and simply run repeatedly at a
+given interval. A second argument to the decorator is required that
+defines the interval in seconds as an integer. Note that the interval
+argument is used to ``sleep`` after each time the event handler is run,
+in order to implement the interval, so an interval of 30 seconds won't
+necessarily run precisely twice per minute, since the event handler
+itself will take time to execute, particularly if it accesses external
+resources over a network.
 
 
 Webhook Events

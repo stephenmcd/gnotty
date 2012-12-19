@@ -4,8 +4,11 @@ from inspect import getargspec
 from logging import Formatter, StreamHandler, getLogger
 from re import match
 
+from gevent import sleep, spawn
+
 from gnotty.client import BaseIRCClient
 from gnotty.conf import settings
+
 
 
 class BaseBot(BaseIRCClient):
@@ -34,7 +37,7 @@ class BaseBot(BaseIRCClient):
 
     def __init__(self, *args, **kwargs):
         """
-        Sets up logging.
+        Sets up logging and interval events.
         """
         super(BaseBot, self).__init__(*args, **kwargs)
         fmt = Formatter("[%(server)s%(channel)s] %(nickname)s: %(message)s")
@@ -43,6 +46,18 @@ class BaseBot(BaseIRCClient):
         logger = getLogger("irc.message")
         logger.setLevel(settings.LOG_LEVEL)
         logger.addHandler(handler)
+        # Spawn a thread (greenlet) for each timer event handler.
+        for handler in self.events.get("timer", []):
+            spawn(self.on_timer, handler)
+
+    def on_timer(self, handler):
+        """
+        Runs each timer handler in a separate greenlet thread.
+        """
+        interval = handler.event["args"][0]
+        while True:
+            handler(self)
+            sleep(interval)
 
     def _dispatcher(self, connection, event):
         """
