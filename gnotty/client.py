@@ -1,7 +1,7 @@
 
 from logging import getLogger
 
-from irc.client import SimpleIRCClient
+from irc.client import SimpleIRCClient, ServerConnectionError
 
 from gnotty.conf import settings
 
@@ -18,8 +18,16 @@ class BaseIRCClient(SimpleIRCClient, object):
         self.port = int(port) if str(port).isdigit() else 6667
         self.channel = channel
         self.nickname = nickname
-        password = password or None
-        self.connect(self.host, self.port, self.nickname, password=password)
+        self.password = password or None
+        self.reconnect()
+
+    def reconnect(self):
+        args = (self.host, self.port, self.nickname)
+        try:
+            self.connect(*args, password=self.password)
+            return True
+        except ServerConnectionError:
+            return False
 
     def _dispatcher(self, connection, event):
         event_args = "".join(event.arguments()).decode("utf-8")

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import with_statement
-from gevent import monkey, spawn
+from gevent import monkey, spawn, sleep
 monkey.patch_all()
 
 from Cookie import Cookie
@@ -75,6 +75,22 @@ class IRCApplication(object):
                              settings.IRC_CHANNEL, settings.BOT_NICKNAME,
                              settings.BOT_PASSWORD)
         spawn(self.bot.start)
+        spawn(self.bot_watcher)
+
+    def bot_watcher(self):
+        """
+        Thread (greenlet) that will try and reconnect the bot if
+        it's not connected.
+        """
+        default_interval = 5
+        interval = default_interval
+        while True:
+            if not self.bot.connection.connected:
+                if self.bot.reconnect():
+                    interval = default_interval
+                else:
+                    interval *= 2
+            sleep(interval)
 
     def respond_webhook(self, environ):
         """
