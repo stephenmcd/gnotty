@@ -27,6 +27,10 @@ if (!location.hash) {
 {% ifchanged day %}
 <tr>
     <th colspan="{% if request.GET.q %}4{% else %}3{% endif %}">
+        <ul class="pager pager-archive">
+            {% if prev_url %}<li><a href="{{ prev_url }}" class="previous">&larr; Previous day</a></li>{% endif %}
+            {% if next_url %}<li><a href="{{ next_url }}" class="next">Next day &rarr;</a></li>{% endif %}
+        </ul>
         <h2><a href="{% url gnotty_day day.year day.month day.day %}">{{ day }}</a></h2>
     </th>
 </tr>
@@ -44,4 +48,9 @@ if (!location.hash) {
 <p>No messages.</p>
 {% endfor %}
 </table>
+
+<ul class="pager pager-archive{% if not messages %} pager-archive-empty{% endif %}">
+    {% if prev_url %}<li><a href="{{ prev_url }}" class="previous">&larr; Previous day</a></li>{% endif %}
+    {% if next_url %}<li><a href="{{ next_url }}" class="next">Next day &rarr;</a></li>{% endif %}
+</ul>
 {% endblock %}

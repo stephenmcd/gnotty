@@ -1,10 +1,11 @@
 
 from calendar import Calendar, SUNDAY
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import info, error
+from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.shortcuts import render, redirect
 
@@ -28,6 +29,7 @@ def messages(request, year=None, month=None, day=None,
     """
 
     query = request.REQUEST.get("q")
+    prev_url, next_url = None, None
     if query:
         search = Q(message__icontains=query) | Q(nickname__icontains=query)
         messages = IRCMessage.objects.filter(search).order_by("-message_time")
@@ -37,11 +39,19 @@ def messages(request, year=None, month=None, day=None,
                                              message_time__day=day)
         if hide_joins_and_leaves(request):
             messages = messages.filter(join_or_leave=False)
+        day_delta = timedelta(days=1)
+        this_date = date(int(year), int(month), int(day))
+        prev_date = this_date - day_delta
+        next_date = this_date + day_delta
+        prev_url = reverse("gnotty_day", args=prev_date.timetuple()[:3])
+        next_url = reverse("gnotty_day", args=next_date.timetuple()[:3])
     else:
         return redirect("gnotty_year", year=datetime.now().year)
 
     context = dict(settings)
     context["messages"] = messages
+    context["prev_url"] = prev_url
+    context["next_url"] = next_url
     return render(request, template, context)
 
 

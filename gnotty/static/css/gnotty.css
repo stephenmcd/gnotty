@@ -23,6 +23,10 @@ th {border-top:0 !important; text-indent:5px;}
 #messages td, .nickname {border:0;}
 #messages .time {color:#999; font-size:12px;}
 #messages .nickname {text-align:right;}
+.pager-archive {float:right; text-align:right; margin:-20px 20px 40px 0;}
+.pager-archive-empty {margin:-60px 10px 0 0;}
+#messages .pager-archive {margin:5px;}
+.pager-archive li {font-weight:bold; margin-left:10px;}
 .message-highlighted td {background:#ffc !important;}
 
 #nicknames {margin-bottom:0;}
