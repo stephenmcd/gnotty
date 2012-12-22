@@ -139,6 +139,7 @@ class IRCApplication(object):
             base = base.replace("{% block content %}", f.read())
         replace = {
             "{% block content %}": "",
+            "{% block extrahead %}": "",
             "{% endblock %}": "",
             "{% load gnotty_tags %}": "",
             "{% extends \"gnotty/base.html\" %}": "",

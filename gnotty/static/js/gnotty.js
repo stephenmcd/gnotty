@@ -202,6 +202,11 @@ var gnotty = function(options) {
         // Message received handler.
         client.onMessage = function(data) {
 
+            if ((data.message == 'joins' || data.message == 'leaves')
+                && !showJoinsAndLeaves()) {
+                return;
+            }
+
             // Add a timestamp to each message as we receive it, and
             // add it to the messages display.
             var d = new Date();
@@ -292,5 +297,13 @@ var gnotty = function(options) {
     $('#input').after('<input type="password" class="input-xlarge" ' +
                       'id="password" placeholder="password (optional)" ' +
                       'name="password" autocomplete="off">');
+
+    // Remove the action of the form for the show joins/leaves checkbox.
+    // This prevents the page from being reloaded, which is what happens
+    // (triggered in show-joins-leaves.js) when the checkbox changes,
+    // in any of the archive views, since we need to reload to
+    // to show any changes triggered by this, but when we're chatting
+    // in the channel, this happens on the fly.
+    $('#joins-leaves').attr({action: ''});
 
 };

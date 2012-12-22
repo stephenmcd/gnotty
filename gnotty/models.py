@@ -14,6 +14,7 @@ class IRCMessage(models.Model):
     server = models.CharField(_("Server"), max_length=100)
     channel = models.CharField(_("Channel"), max_length=100)
     message_time = models.DateTimeField(_("Time"), auto_now_add=True)
+    join_or_leave = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = _("Message")

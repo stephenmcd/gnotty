@@ -12,6 +12,10 @@ from gnotty.models import IRCMessage
 from gnotty.conf import settings
 
 
+def hide_joins_and_leaves(request):
+    return request.COOKIES.get("gnotty-hide-joins-leaves", "") == "1"
+
+
 def chat(request, template="gnotty/chat.html"):
     context = dict(settings)
     return render(request, template, context)
@@ -31,6 +35,8 @@ def messages(request, year=None, month=None, day=None,
         messages = IRCMessage.objects.filter(message_time__year=year,
                                              message_time__month=month,
                                              message_time__day=day)
+        if hide_joins_and_leaves(request):
+            messages = messages.filter(join_or_leave=False)
     else:
         return redirect("gnotty_year", year=datetime.now().year)
 
@@ -51,6 +57,9 @@ def calendar(request, year=None, month=None, template="gnotty/calendar.html"):
     lookup = {"message_time__year": year}
     if month:
         lookup["message_time__month"] = month
+    if hide_joins_and_leaves(request):
+        lookup["join_or_leave"] = False
+
     messages = IRCMessage.objects.filter(**lookup)
     days = [d.date() for d in messages.dates("message_time", "day")]
     min_date, max_date = days[0], days[-1]

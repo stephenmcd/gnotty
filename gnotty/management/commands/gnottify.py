@@ -18,7 +18,8 @@ class ModelLogger(StreamHandler):
         IRCMessage.objects.create(server=record.server,
                                   channel=record.channel,
                                   nickname=record.nickname,
-                                  message=record.msg)
+                                  message=record.msg,
+                                  join_or_leave=record.join_or_leave)
 
 
 class Command(BaseCommand):

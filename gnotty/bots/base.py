@@ -69,11 +69,12 @@ class BaseBot(BaseIRCClient):
         for handler in self.events[event.eventtype()]:
             handler(self, connection, event)
 
-    def log(self, event, message):
+    def log(self, event, message, join_or_leave=False):
         extra = {
             "server": self.connection.server,
             "channel": self.channel,
             "nickname": self.get_nickname(event) if event else self.nickname,
+            "join_or_leave": join_or_leave,
         }
         getLogger("irc.message").info(message, extra=extra)
 
@@ -85,10 +86,10 @@ class BaseBot(BaseIRCClient):
         super(BaseBot, self).message_channel(message)
 
     def on_join(self, connection, event):
-        self.log(event, "joins")
+        self.log(event, "joins", join_or_leave=True)
 
     def on_quit(self, connection, event):
-        self.log(event, "leaves")
+        self.log(event, "leaves", join_or_leave=True)
 
     def on_pubmsg(self, connection, event):
         """

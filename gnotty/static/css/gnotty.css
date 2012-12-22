@@ -12,6 +12,10 @@ th {border-top:30px solid #fff !important;}
 .calendar .not-in-month, .calendar .not-in-month a {color:#ddd;}
 .calendar a {font-weight:bold; text-decoration:underline;}
 
+#joins-leaves {margin:12px 0 0 0;}
+#joins-leaves label {display:inline; color:#666; margin-right:10px;}
+#joins-leaves input {margin-bottom:5px;}
+
 .main-chat {display:none;}
 .main-chat a {text-decoration:underline;}
 .message {width:100%;}
