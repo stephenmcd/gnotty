@@ -62,24 +62,25 @@ def calendar(request, year=None, month=None, template="gnotty/calendar.html"):
 
     messages = IRCMessage.objects.filter(**lookup)
     days = [d.date() for d in messages.dates("message_time", "day")]
-    min_date, max_date = days[0], days[-1]
-    days = set(days)
     months = []
-    calendar = Calendar(SUNDAY)
 
-    for m in range(1, 13) if not month else [int(month)]:
-        lt_max = m <= max_date.month or year < max_date.year
-        gt_min = m >= min_date.month or year > min_date.year
-        if lt_max and gt_min:
-            weeks = calendar.monthdatescalendar(year, m)
-            for w, week in enumerate(weeks):
-                for d, day in enumerate(week):
-                    weeks[w][d] = {
-                        "date": day,
-                        "in_month": day.month == m,
-                        "has_messages": day in days,
-                    }
-            months.append({"month": date(year, m, 1), "weeks": weeks})
+    if days:
+        min_date, max_date = days[0], days[-1]
+        days = set(days)
+        calendar = Calendar(SUNDAY)
+        for m in range(1, 13) if not month else [int(month)]:
+            lt_max = m <= max_date.month or year < max_date.year
+            gt_min = m >= min_date.month or year > min_date.year
+            if lt_max and gt_min:
+                weeks = calendar.monthdatescalendar(year, m)
+                for w, week in enumerate(weeks):
+                    for d, day in enumerate(week):
+                        weeks[w][d] = {
+                            "date": day,
+                            "in_month": day.month == m,
+                            "has_messages": day in days,
+                        }
+                months.append({"month": date(year, m, 1), "weeks": weeks})
 
     context = dict(settings)
     context["months"] = months
