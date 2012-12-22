@@ -1,9 +1,21 @@
 
 from logging import getLogger
+from md5 import md5
 
 from irc.client import SimpleIRCClient, ServerConnectionError
 
 from gnotty.conf import settings
+
+
+def color(nickname):
+    """
+    Provides a consistent color for a nickname. Uses first 6 chars
+    of nickname's md5 hash, and then slightly darkens the rgb values
+    for use on a light background.
+    """
+    _hex = md5(nickname).hexdigest()[:6]
+    darken = lambda s: str(int(round(int(s, 16) * .7)))
+    return "rgb(%s)" % ",".join([darken(_hex[i:i+2]) for i in range(6)[::2]])
 
 
 class BaseIRCClient(SimpleIRCClient, object):
@@ -73,7 +85,7 @@ class WebSocketIRCClient(BaseIRCClient):
     """
 
     def __init__(self, host, port, channel, nickname, password, namespace):
-        self.nicknames = set()
+        self.nicknames = {}
         self.namespace = namespace
         client_args = (host, port, channel, nickname, password)
         super(WebSocketIRCClient, self).__init__(*client_args)
@@ -83,17 +95,23 @@ class WebSocketIRCClient(BaseIRCClient):
         Send a message to the channel. We also emit the message
         back to the sender's WebSocket.
         """
-        if self.nickname in self.nicknames:
-            message = message[:settings.MAX_MESSAGE_LENGTH]
-            self.message_channel(message)
-            self.namespace.emit("message", self.nickname, message)
+        try:
+            nickname_color = self.nicknames[self.nickname]
+        except KeyError:
+            # Only accept messages if we've joined.
+            return
+        message = message[:settings.MAX_MESSAGE_LENGTH]
+        self.message_channel(message)
+        self.namespace.emit("message", self.nickname, message, nickname_color)
 
     def emit_nicknames(self):
         """
         Send the nickname list to the Websocket. Called whenever the
         nicknames list changes.
         """
-        self.namespace.emit("nicknames", list(self.nicknames))
+        nicknames = [{"nickname": name, "color": color(name)}
+                     for name in sorted(self.nicknames.keys())]
+        self.namespace.emit("nicknames", nicknames)
 
     def on_erroneusnickname(self, connection, event):
         """
@@ -106,8 +124,9 @@ class WebSocketIRCClient(BaseIRCClient):
         Initial list of nicknames received - remove op/voice prefixes,
         and send the list to the WebSocket.
         """
-        nicknames = [s.lstrip("@+") for s in event.arguments()[-1].split()]
-        self.nicknames |= set(nicknames)
+        for nickname in event.arguments()[-1].split():
+            nickname = nickname.lstrip("@+")
+            self.nicknames[nickname] = color(nickname)
         self.emit_nicknames()
 
     def on_join(self, connection, event):
@@ -117,9 +136,10 @@ class WebSocketIRCClient(BaseIRCClient):
         """
         #from time import sleep; sleep(10)  # Simulate a slow connection
         nickname = self.get_nickname(event)
-        self.nicknames.add(nickname)
+        nickname_color = color(nickname)
+        self.nicknames[nickname] = nickname_color
         self.namespace.emit("join")
-        self.namespace.emit("message", nickname, "joins")
+        self.namespace.emit("message", nickname, "joins", nickname_color)
         self.emit_nicknames()
 
     def on_quit(self, connection, event):
@@ -128,8 +148,9 @@ class WebSocketIRCClient(BaseIRCClient):
         WebSocket.
         """
         nickname = self.get_nickname(event)
-        self.nicknames.remove(nickname)
-        self.namespace.emit("message", nickname, "leaves")
+        nickname_color = self.nicknames[nickname]
+        del self.nicknames[nickname]
+        self.namespace.emit("message", nickname, "leaves", nickname_color)
         self.emit_nicknames()
 
     def on_pubmsg(self, connection, event):
@@ -137,4 +158,6 @@ class WebSocketIRCClient(BaseIRCClient):
         Messages received in the channel - send them to the WebSocket.
         """
         for message in event.arguments():
-            self.namespace.emit("message", self.get_nickname(event), message)
+            nickname = self.get_nickname(event)
+            nickname_color = self.nicknames[nickname]
+            self.namespace.emit("message", nickname, message, nickname_color)

@@ -36,7 +36,7 @@ if (!location.hash) {
     <td><a class="btn btn-mini btn-primary" href="{{ message.get_absolute_url }}?id={{ message.id }}">View</a></td>
     {% endif %}
     <td class="time">[{{ message.message_time|date:"H:i:s" }}]</td>
-    <td class="nickname">{{ message.nickname }}:</td>
+    <td class="nickname" style="color:{{ message.color }};">{{ message.nickname }}:</td>
     <td class="message">{{ message.message|urlize }}</td>
 </tr>
 {% endwith %}

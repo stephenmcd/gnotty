@@ -21,7 +21,7 @@ th {border-top:0 !important; text-indent:5px;}
 .main-chat a {text-decoration:underline;}
 .message {width:100%;}
 #messages td, .nickname {border:0;}
-#messages .time {color:#888; font-size:12px;}
+#messages .time {color:#999; font-size:12px;}
 #messages .nickname {text-align:right;}
 .message-highlighted td {background:#ffc !important;}
 

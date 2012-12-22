@@ -2,6 +2,8 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from gnotty.client import color
+
 
 class IRCMessage(models.Model):
     """
@@ -38,3 +40,6 @@ class IRCMessage(models.Model):
     def short_message(self):
         return self.message[:50]
     short_message.short_description = _("Message")
+
+    def color(self):
+        return color(self.nickname)

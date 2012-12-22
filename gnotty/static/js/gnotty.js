@@ -86,9 +86,13 @@ var IRCClient = function(options) {
         }
     });
 
-    self.socket.on('message', function(nickname, message) {
+    self.socket.on('message', function(nickname, message, color) {
         if (self.onMessage) {
-            self.onMessage({nickname: nickname, message: message});
+            self.onMessage({
+                nickname: nickname,
+                message: message,
+                color: color
+            });
         }
     });
 
@@ -101,18 +105,6 @@ var gnotty = function(options) {
     var joining = false;
     var unread = 0;
     var title = $('title').text();
-
-    // Assign a dark colour to each nickname.
-    var colors = {};
-    var color = function(nickname) {
-        if (!colors[nickname]) {
-            var c = function() {
-                return Math.ceil(Math.random() * 150);
-            };
-            colors[nickname] = 'rgb(' + c() + ',' + c() + ',' + c() + ')';
-        }
-        return colors[nickname];
-    };
 
     // Main setup function called when nickname is entered.
     // Creates IRC client and sets up event handlers.
@@ -192,9 +184,6 @@ var gnotty = function(options) {
         // Render the nickanmes list each time we receive it,
         // which is each time someone joins or leaves.
         client.onNicknames = function(nicknames) {
-            nicknames = $.map(nicknames.sort(), function(nickname) {
-                return {nickname: nickname, color: color(nickname)};
-            });
             var data = {nicknames: nicknames};
             $('#nicknames').html($('#nicknames-template').tmpl(data));
         };
@@ -214,7 +203,6 @@ var gnotty = function(options) {
             data.time = $.map(parts, function(s) {
                 return (String(s).length == 1 ? '0' : '') + s;
             }).join(':')
-            data.color = color(data.nickname);
 
             data.message = urlize($('<div>').text(data.message).html());
 
