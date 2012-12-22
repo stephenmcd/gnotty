@@ -6,17 +6,18 @@ body {margin:70px 0 65px 0;}
 footer {position:fixed; left:0; bottom:0; background:#ddd; width:100%;
         border-top:1px solid #999; padding:0 20px;}
 
-table {margin-top:-15px;}
-th {border-top:30px solid #fff !important;}
+th {border-top:0 !important; text-indent:5px;}
+.calendar {margin-bottom:30px;}
 .calendar th, .calendar td {text-align:center;}
 .calendar .not-in-month, .calendar .not-in-month a {color:#ddd;}
 .calendar a {font-weight:bold; text-decoration:underline;}
+.archive {margin-bottom:40px;}
 
 #joins-leaves {margin:12px 0 0 0;}
 #joins-leaves label {display:inline; color:#666; margin-right:10px;}
 #joins-leaves input {margin-bottom:5px;}
 
-.main-chat {display:none;}
+.main-chat {display:none; margin-top:-15px;}
 .main-chat a {text-decoration:underline;}
 .message {width:100%;}
 #messages td, .nickname {border:0;}
