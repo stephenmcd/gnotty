@@ -439,7 +439,9 @@ the log record instance:
   * ``record.channel`` - The IRC channel the message occurred on.
   * ``record.nickname`` - The nickname of the user who sent the
     message.
-  * ``record.msg`` - The message itself.
+  * ``record.msg`` - The actual message string itself.
+  * ``record.join_or_leave`` - ``True`` if the record was for a user
+    joining or leaving the channel, otherwise ``False``.
 
 Here's an example of adding an extra logging handler for IRC messages::
 
@@ -501,13 +503,17 @@ events out to the console::
     };
 
     // When someone joins or leaves the channel, we're given the
-    // entire user list.
+    // entire user list. It'a an array of objects, each with a
+    // nickname and color property.
     client.onNicknames = function(nicknames) {
-        console.log('The user list changed, here it is: ' + nicknames.join(', '));
+        nicknames = $.map(nicknames, function(obj) {
+            return obj.nickname;
+        }).join(', ');
+        console.log('The user list changed, here it is: ' + nicknames);
     });
 
     // Whenever a message is received from the channel, it's an
-    // object with nickname and message properties.
+    // object with nickname, message and color properties.
     client.onMessage = function(data) {
         console.log(data.nickname + ' wrote: ' + data.message);
     });
@@ -525,6 +531,12 @@ events out to the console::
 As you may have guessed, the server-side settings configured for
 Gnotty are passed directly into the ``gnotty`` JavaScript function,
 which then creates its own ``IRCClient`` instance.
+
+You'll also see the data sent to the ``onMessage`` and ``onNickname``
+events contain color values that the interface can use for colorizing
+nicknames. These are calculated on the server, so that both the chat
+interface and message archive produce consistent colors every time
+a particular nickname is displayed.
 
 
 Hosting Private Chat Rooms
