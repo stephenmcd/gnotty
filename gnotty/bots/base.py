@@ -47,7 +47,7 @@ class BaseBot(BaseIRCClient):
         logger.addHandler(handler)
         # Spawn a thread (greenlet) for each timer event handler.
         for handler in self.events.get("timer", []):
-            spawn(self.on_timer, handler)
+            spawn(self.handle_timer_event, handler)
 
     def _dispatcher(self, connection, event):
         """
@@ -91,9 +91,9 @@ class BaseBot(BaseIRCClient):
             command_name = command_args.pop(0)
             for handler in self.events["command"]:
                 if handler.event.args["command"] == command_name:
-                    self.on_command(event, handler, command_args)
+                    self.handle_command_event(event, handler, command_args)
 
-    def on_command(self, event, command, args):
+    def handle_command_event(self, event, command, args):
         """
         Command handler - treats each word in the message
         that triggered the command as an argument to the command,
@@ -114,7 +114,7 @@ class BaseBot(BaseIRCClient):
         response = "%s: %s" % (self.get_nickname(event), response)
         self.message_channel(response)
 
-    def on_timer(self, handler):
+    def handle_timer_event(self, handler):
         """
         Runs each timer handler in a separate greenlet thread.
         """
@@ -122,7 +122,7 @@ class BaseBot(BaseIRCClient):
             handler(self)
             sleep(handler.event.args["seconds"])
 
-    def on_webhook(self, environ, url, params):
+    def handle_webhook_event(self, environ, url, params):
         """
         Webhook handler - each handler for the webhook event
         takes an initial pattern argument for matching the URL

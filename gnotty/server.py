@@ -101,7 +101,7 @@ class IRCApplication(object):
         url = environ["PATH_INFO"]
         params = dict([(k, request[k].value) for k in request])
         try:
-            response = self.bot.on_webhook(environ, url, params)
+            response = self.bot.handle_webhook_event(environ, url, params)
         except NotImplementedError:
             return 404
         except:
@@ -267,8 +267,8 @@ def run():
     CLI entry point. Parses args and starts the gevent-socketio server.
     """
     settings.parse_args()
-    pid_file = settings.PID_FILE or os.path.join(gettempdir(),
-        "gnotty-%s-%s.pid" % (settings.HTTP_HOST, settings.HTTP_PORT))
+    pid_name = "gnotty-%s-%s.pid" % (settings.HTTP_HOST, settings.HTTP_PORT)
+    pid_file = settings.PID_FILE or os.path.join(gettempdir(), pid_name)
     if settings.KILL:
         if kill(pid_file):
             print "Daemon killed"
