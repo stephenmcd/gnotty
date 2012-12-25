@@ -300,7 +300,7 @@ the event name and marks the method as being a handler for that event.
 The decorator may also accept optional keyword arguments depending on
 the type of event. Several types of events are available:
 
-  * IRC server events, as implemented by the ``irclib`` package's
+  * IRC channel events, as implemented by the ``irclib`` package's
     ``irc.client.SimpleIRCClient`` class.
   * IRC commands, which are custom commands that can be triggered by
     users in the IRC channel. Each of these take a ``command`` keyword
@@ -321,7 +321,7 @@ Here's an example IRC bot that implements all the above event types::
 
       @events.on("join")
       def my_join_handler(self, connection, event):
-          """IRC server event - someone joined the channel."""
+          """IRC channel event - someone joined the channel."""
           nickname = self.get_nickname(event)
           self.message_channel("Hello %s" nickname)
 
@@ -349,13 +349,13 @@ Gnotty can be started with the bot using the following arguments::
   $ gnottify --http-host=127.0.0.1 --http-port=8000 --bot-class=my_bot.MyBot
 
 
-Server Events
-=============
+Channel Events
+==============
 
-As described above, each of the IRC server events implemented by the
+As described above, each of the IRC channel events implemented by the
 ``irclib`` package's ``irc.client.SimpleIRCClient`` class are available
 as event handlers for an IRC bot. Consult the ``irclib`` docs or source
-code for details about each of the IRC server events that are
+code for details about each of the IRC channel events that are
 implemented, as documenting all of these is beyond the scope of this
 document. Here are some of the common events to get you started:
 
@@ -367,7 +367,7 @@ document. Here are some of the common events to get you started:
   - ``events.on("quit")``: Someone left the channel.
   - ``events.on("pubmsg")``: A message was sent to the channel.
 
-Each of the server events receive a ``connection`` and ``event``
+Each of the channel events receive a ``connection`` and ``event``
 argument, which are objects for the connection to the IRC server, and
 information about the event that occurred.
 
