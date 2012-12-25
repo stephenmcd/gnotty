@@ -1,4 +1,9 @@
 
+from collections import namedtuple
+
+
+Event = namedtuple("Event", ["name", "args"])
+
 
 def on(event, *args, **kwargs):
     """
@@ -10,6 +15,8 @@ def on(event, *args, **kwargs):
     called when the event occurs.
     """
     def wrapper(func):
-        func.event = {"name": event, "args": args, "kwargs": kwargs}
+        for i, arg in args:
+            kwargs[i] = arg
+        func.event = Event(event, kwargs)
         return func
     return wrapper

@@ -68,7 +68,7 @@ class GitHubMixin(CommitMixin):
     Mixin for GitHub post-push webhook bot.
     """
 
-    @events.on("webhook", "^/webhook/github/$")
+    @events.on("webhook", urlpattern="^/webhook/github/$")
     def github_payload(self, environ, url, params):
         payload = loads(params["payload"])
         self.handle_payload(GitHubPayload(payload))
@@ -100,7 +100,7 @@ class BitBucketMixin(CommitMixin):
     Bitbucket payload handler.
     """
 
-    @events.on("webhook", "^/webhook/bitbucket/$")
+    @events.on("webhook", urlpattern="^/webhook/bitbucket/$")
     def bitbucket_payload(self, environ, url, params):
         payload = loads(params["payload"])
         self.handle_payload(BitBucketPayload(payload))

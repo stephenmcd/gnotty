@@ -73,7 +73,7 @@ class CommandMixin(object):
     #  Commands  #
     ##############
 
-    @events.on("command", "!version")
+    @events.on("command", command="!version")
     def version(self, event):
         """
         Shows version information.
@@ -81,7 +81,7 @@ class CommandMixin(object):
         name = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
         return "%s [%s]" % (settings.GNOTTY_VERSION_STRING, name)
 
-    @events.on("command", "!commands")
+    @events.on("command", command="!commands")
     def commands(self, event):
         """
         Lists all available commands.
@@ -89,7 +89,7 @@ class CommandMixin(object):
         commands = sorted(self.commands_dict().keys())
         return "Available commands: %s" % " ".join(commands)
 
-    @events.on("command", "!help")
+    @events.on("command", command="!help")
     def help(self, event, command_name=None):
         """
         Shows the help message for the bot. Takes an optional command name
@@ -113,7 +113,7 @@ class CommandMixin(object):
         help = getdoc(command).replace("\n", " ")
         return "help for %s: (args: %s) %s" % (command_name, args, help)
 
-    @events.on("command", "!uptime")
+    @events.on("command", command="!uptime")
     def uptime(self, event, nickname=None):
         """
         Shows the amount of time since the given nickname has been
@@ -133,7 +133,7 @@ class CommandMixin(object):
         uptime = self.timesince(self.joined[self.nickname])
         return "I've been here for %s" % uptime
 
-    @events.on("command", "!seen")
+    @events.on("command", command="!seen")
     def seen(self, event, nickname):
         """
         Shows the amount of time since the given nickname was last
@@ -156,7 +156,7 @@ class CommandMixin(object):
         else:
             return "%s was last seen %s ago" % (nickname,  seen)
 
-    @events.on("command", "!users")
+    @events.on("command", command="!users")
     def users(self, event):
         """
         Shows the list of users currently in the channel.

@@ -10,7 +10,6 @@ from gnotty.client import BaseIRCClient
 from gnotty.conf import settings
 
 
-
 class BaseBot(BaseIRCClient):
     """
     Base bot class. Bots can be built by subclassing ``BaseBot`` and
@@ -32,7 +31,7 @@ class BaseBot(BaseIRCClient):
             attrs["events"] = defaultdict(list)
             for member in members:
                 if hasattr(member, "event"):
-                    attrs["events"][member.event["name"]].append(member)
+                    attrs["events"][member.event.name].append(member)
             return type.__new__(cls, name, bases, attrs)
 
     def __init__(self, *args, **kwargs):
@@ -49,15 +48,6 @@ class BaseBot(BaseIRCClient):
         # Spawn a thread (greenlet) for each timer event handler.
         for handler in self.events.get("timer", []):
             spawn(self.on_timer, handler)
-
-    def on_timer(self, handler):
-        """
-        Runs each timer handler in a separate greenlet thread.
-        """
-        interval = handler.event["args"][0]
-        while True:
-            handler(self)
-            sleep(interval)
 
     def _dispatcher(self, connection, event):
         """
@@ -97,11 +87,11 @@ class BaseBot(BaseIRCClient):
         """
         for message in event.arguments():
             self.log(event, message)
-            args = filter(None, message.split())
-            name = args.pop(0)
-            for command in self.events["command"]:
-                if command.event["args"][0] == name:
-                    self.on_command(event, command, args)
+            command_args = filter(None, message.split())
+            command_name = command_args.pop(0)
+            for handler in self.events["command"]:
+                if handler.event.args["command"] == command_name:
+                    self.on_command(event, handler, command_args)
 
     def on_command(self, event, command, args):
         """
@@ -124,6 +114,14 @@ class BaseBot(BaseIRCClient):
         response = "%s: %s" % (self.get_nickname(event), response)
         self.message_channel(response)
 
+    def on_timer(self, handler):
+        """
+        Runs each timer handler in a separate greenlet thread.
+        """
+        while True:
+            handler(self)
+            sleep(handler.event.args["seconds"])
+
     def on_webhook(self, environ, url, params):
         """
         Webhook handler - each handler for the webhook event
@@ -132,8 +130,8 @@ class BaseBot(BaseIRCClient):
         webhook handler, and bail out if it returns a response.
         """
         for handler in self.events["webhook"]:
-            args = handler.event["args"]
-            if not args or match(args[0], url):
+            urlpattern = handler.event.arg["urlpattern"]
+            if not urlpattern or match(urlpattern, url):
                 response = handler(self, environ, url, params)
                 if response:
                     return response

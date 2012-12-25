@@ -295,22 +295,23 @@ Bot Events
 Gnotty's IRC bots make use of an event handling system. Event handlers
 are implemented as methods on any of the classes used to build a bot.
 Each event handler gets wrapped with the decorator
-``gnotty.bots.events.on``, which takes an initial event name argument,
-and marks the method as being a handler for that event. Several types
-of events are available:
+``gnotty.bots.events.on``, which takes a single positional argument for
+the event name and marks the method as being a handler for that event.
+The decorator may also accept optional keyword arguments depending on
+the type of event. Several types of events are available:
 
   * IRC server events, as implemented by the ``irclib`` package's
     ``irc.client.SimpleIRCClient`` class.
   * IRC commands, which are custom commands that can be triggered by
-    users in the IRC channel, and take a second argument to the
-    ``gnotty.bots.events.on`` decorator, which specifies the command
-    name.
+    users in the IRC channel. Each of these take a ``command`` keyword
+    argument, which defines the command name.
   * Timer events, which are handlers that are periodically run at a
-    defined time interval.
-  * Webhooks, which are handlers that accept data over HTTP, and also
-    take a second argument to the ``gnotty.bots.events.on`` decorator,
-    which specifies URL to match with a regular expression, similar to
-    Django's ``urlpatterns``.
+    defined time interval. Each of these take a ``seconds`` keyword
+    argument, which defines the time interval.
+  * Webhooks, which are handlers that accept data over HTTP. Each of
+    take a ``urlpattern`` keyword argument which defines a regular
+    expression to match against the webhook's URL, similar to Django's
+    ``urlpatterns``.
 
 Here's an example IRC bot that implements all the above event types::
 
@@ -324,19 +325,19 @@ Here's an example IRC bot that implements all the above event types::
           nickname = self.get_nickname(event)
           self.message_channel("Hello %s" nickname)
 
-      @events.on("timer", 10)
+      @events.on("timer", seconds=10)
       def my_timer(self):
           """Do something every 10 seconds."""
           msg = "Another 10 seconds has passed, are you annoyed yet?"
           self.message_channel(msg)
 
-      @events.on("command", "!time")
+      @events.on("command", command="!time")
       def my_time_command(self, connection, event):
           """Write the time to the channel when someone types !time"""
           from datetime import datetime
           return "The date and time is %s" % datetime.now()
 
-      @events.on("webhook", "^/webhook/do/something/$")
+      @events.on("webhook", urlpattern="^/webhook/do/something/$")
       def my_webhook_handler(self, environ, url, params):
           """Tell the channel that someone hit the webhook URL."""
           ip = environ["REMOTE_ADDR"]
@@ -354,35 +355,35 @@ Server Events
 As described above, each of the IRC server events implemented by the
 ``irclib`` package's ``irc.client.SimpleIRCClient`` class are available
 as event handlers for an IRC bot. Consult the ``irclib`` docs or source
-code for details about each of the IRC server events that are implemented,
-as documenting all of these is beyond the scope of this document. Here
-are some of the common events to get you started:
+code for details about each of the IRC server events that are
+implemented, as documenting all of these is beyond the scope of this
+document. Here are some of the common events to get you started:
 
-  - ``events.on("welcome")``: Bot has connected to the server but not yet
-    joined the channel.
-  - ``events.on("namreply")``: Bot receives the initial list of nicknames
-    in the channel once joined.
+  - ``events.on("welcome")``: Bot has connected to the server but not
+    yet joined the channel.
+  - ``events.on("namreply")``: Bot receives the initial list of
+    nicknames in the channel once joined.
   - ``events.on("join")``: Someone new joined the channel.
   - ``events.on("quit")``: Someone left the channel.
   - ``events.on("pubmsg")``: A message was sent to the channel.
 
-Each of the server events receive a ``connection`` and ``event`` argument,
-which are objects for the connection to the IRC server, and information
-about the event that occurred.
+Each of the server events receive a ``connection`` and ``event``
+argument, which are objects for the connection to the IRC server, and
+information about the event that occurred.
 
 
 Command Events
 ==============
 
-Event handlers for simple commands can be implemented using the ``command``
-event name for the ``gnotty.bots.events.on`` decorator. The decorator then
-takes a second argument, which is the command name itself. Command events
-are then triggered by any public messages in the channel that contain the
-command name as the first word in the message. Each subsequent word in the
-message after the command is then passed as a separate argument to the
-event handler method for the command. In each command event handler method,
-the bot can then perform some task, and return a message back to the
-channel.
+Event handlers for simple commands can be implemented using the
+``command`` event name for the ``gnotty.bots.events.on`` decorator.
+The decorator then takes a ``command`` keyword argument, which is the
+command name itself. Command events are then triggered by any public
+messages in the channel that contain the command name as the first word
+in the message. Each subsequent word in the message after the command
+is then passed as a separate argument to the event handler method for
+the command. In each command event handler method, the bot can then
+perform some task, and return a message back to the channel.
 
 
 Timer Events
@@ -390,13 +391,13 @@ Timer Events
 
 These event handlers are defined using the ``timer`` event name for the
 ``gnotty.bots.events.on`` decorator, and simply run repeatedly at a
-given interval. A second argument to the decorator is required that
-defines the interval in seconds as an integer. Note that the interval
-argument is used to ``sleep`` after each time the event handler is run,
-in order to implement the interval, so an interval of 30 seconds won't
-necessarily run precisely twice per minute, since the event handler
-itself will take time to execute, particularly if it accesses external
-resources over a network.
+given interval. A ``seconds`` keyword argument to the decorator defines
+the interval in seconds as an integer. Note that the ``seconds``
+keyword argument is used to ``sleep`` after each time the event handler
+is run, in order to implement the interval, so an interval of 30
+seconds won't necessarily run precisely twice per minute, since the
+event handler itself will take time to execute, particularly if it
+accesses external resources over a network.
 
 
 Webhook Events
@@ -404,9 +405,10 @@ Webhook Events
 
 IRC bots run by Gnotty contain the ability to receive data over HTTP
 via webhooks. Webhooks are methods defined on the bot class with the
-``webhook`` event handler specified for the ``gnotty.bots.events.on``
-decorator. The decorator also requires a second argument, which is a
-regular expression for matching the webhook URL.
+``webhook`` event handler name specified for the
+``gnotty.bots.events.on`` decorator. The decorator also requires a
+``urlpattern`` keyword argument, which is a regular expression for
+matching the webhook URL.
 
 The gevent web server will intercept any URLs prefixed
 with the path ``/webhook/``, and pass the request onto the bot which

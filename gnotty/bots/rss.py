@@ -26,7 +26,7 @@ class RSSMixin(object):
         self.parse_feeds(message_channel=False)
         super(RSSMixin, self).__init__(*args, **kwargs)
 
-    @events.on("timer", 60)
+    @events.on("timer", seconds=60)
     def parse_feeds(self, message_channel=True):
         """
         Iterates through each of the feed URLs, parses their items, and
