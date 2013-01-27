@@ -101,6 +101,10 @@ class WebSocketIRCClient(BaseIRCClient):
             # Only accept messages if we've joined.
             return
         message = message[:settings.MAX_MESSAGE_LENGTH]
+        # Handle IRC commands.
+        if message.startswith("/"):
+            self.connection.send_raw(message.lstrip("/"))
+            return
         self.message_channel(message)
         self.namespace.emit("message", self.nickname, message, nickname_color)
 
