@@ -81,6 +81,9 @@ class BaseBot(BaseIRCClient):
     def on_quit(self, connection, event):
         self.log(event, "leaves", join_or_leave=True)
 
+    def on_nick(self, connection, event):
+        self.log(event, "is now known as %s" % event.target())
+
     def on_pubmsg(self, connection, event):
         """
         Log any public messages, and also handle the command event.
