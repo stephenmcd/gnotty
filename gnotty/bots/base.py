@@ -133,7 +133,7 @@ class BaseBot(BaseIRCClient):
         webhook handler, and bail out if it returns a response.
         """
         for handler in self.events["webhook"]:
-            urlpattern = handler.event.arg["urlpattern"]
+            urlpattern = handler.event.args["urlpattern"]
             if not urlpattern or match(urlpattern, url):
                 response = handler(self, environ, url, params)
                 if response:
