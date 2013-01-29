@@ -11,6 +11,7 @@ from mimetypes import guess_type
 import os
 import sys
 from tempfile import gettempdir
+from traceback import format_exc
 
 from daemon import daemonize
 from socketio import socketio_manage
@@ -76,6 +77,9 @@ class IRCApplication(object):
                              settings.BOT_PASSWORD)
         spawn(self.bot.start)
         spawn(self.bot_watcher)
+        self.logger = getLogger("irc.webhooks")
+        self.logger.setLevel(settings.LOG_LEVEL)
+        self.logger.addHandler(StreamHandler())
 
     def bot_watcher(self):
         """
@@ -105,6 +109,7 @@ class IRCApplication(object):
         except NotImplementedError:
             return 404
         except:
+            self.logger.debug(format_exc())
             return 500
         return response or 200
 
