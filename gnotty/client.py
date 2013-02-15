@@ -42,7 +42,7 @@ class BaseIRCClient(SimpleIRCClient, object):
             return False
 
     def _dispatcher(self, connection, event):
-        event_args = "".join(event.arguments()).decode("utf-8")
+        event_args = "".join(event.arguments())
         log = (event.eventtype(), self.nickname, event_args)
         getLogger("irc.dispatch").debug("%s: [%s] %s" % log)
         SimpleIRCClient._dispatcher(self, connection, event)
@@ -76,6 +76,7 @@ class BaseIRCClient(SimpleIRCClient, object):
         """
         Nicer shortcut for sending a message to a channel.
         """
+        message = message.encode("ascii", "replace")
         self.connection.privmsg(self.channel, message)
 
 
