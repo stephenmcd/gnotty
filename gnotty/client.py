@@ -42,7 +42,7 @@ class BaseIRCClient(SimpleIRCClient, object):
             return False
 
     def _dispatcher(self, connection, event):
-        event_args = "".join(event.arguments())
+        event_args = "".join(event.arguments()).decode("utf-8")
         log = (event.eventtype(), self.nickname, event_args)
         getLogger("irc.dispatch").debug("%s: [%s] %s" % log)
         SimpleIRCClient._dispatcher(self, connection, event)
@@ -74,10 +74,12 @@ class BaseIRCClient(SimpleIRCClient, object):
 
     def message_channel(self, message):
         """
-        Nicer shortcut for sending a message to a channel.
+        Nicer shortcut for sending a message to a channel. Also
+        irclib doesn't handle unicode so we bypass its
+        privmsg -> send_raw methods and use its socket directly.
         """
-        message = message.encode("ascii", "replace")
-        self.connection.privmsg(self.channel, message)
+        data = "PRIVMSG %s :%s\r\n" % (self.channel, message)
+        self.connection.socket.send(data.encode("utf-8"))
 
 
 class WebSocketIRCClient(BaseIRCClient):
