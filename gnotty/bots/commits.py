@@ -16,7 +16,8 @@ class CommitMixin(object):
         commit = lambda c: "%s - %s" % (c["message"], payload.author(c))
         messages = [commit(c) for c in payload.commits()]
         if len(messages) == 1:
-            messages[0] = "%s %s" % (messages[0], payload.commit_url(commit))
+            commit_url = payload.commit_url(payload.commits()[0])
+            messages[0] = "%s %s" % (messages[0], commit_url)
         else:
             messages.insert(0, "%s new commits:" % len(payload.commits()))
             messages.append("Compare view: %s" % payload.diff_url())
@@ -87,8 +88,7 @@ class BitBucketPayload(CommitPayload):
         return commit["raw_author"].split("<")[0]
 
     def commit_url(self, commit):
-        repo_url = self.repo_url(self.payload)
-        return "%schangeset/%s/" % (repo_url, commit["node"])
+        return "%schangeset/%s/" % (self.repo_url(), commit["node"])
 
     def diff_url(self):
         first, last = self.commits()[0]["node"], self.commits()[-1]["node"]
