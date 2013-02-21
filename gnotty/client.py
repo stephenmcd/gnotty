@@ -42,6 +42,14 @@ class BaseIRCClient(SimpleIRCClient, object):
             return False
 
     def _dispatcher(self, connection, event):
+        if not callable(event.arguments):
+            # irclib decided to change the event API, so here
+            # we make it backward compatible.
+            arguments = event.arguments
+            event.arguments = lambda: arguments
+            event.eventtype = lambda: event.type
+            source = event.source
+            event.source = lambda: source
         event_args = "".join(event.arguments()).decode("utf-8")
         log = (event.eventtype(), self.nickname, event_args)
         getLogger("irc.dispatch").debug("%s: [%s] %s" % log)
