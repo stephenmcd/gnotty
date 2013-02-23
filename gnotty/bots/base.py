@@ -27,9 +27,14 @@ class BaseBot(BaseIRCClient):
             "event" attribute, which gets assgined by the
             ``gnotty.bots.events.on`` decorator.
             """
-            members = sum([b.__dict__.values() for b in bases], attrs.values())
+            def all_bases(bases):
+                for base in bases:
+                    yield base
+                    for base in all_bases(base.__bases__):
+                        yield base
+            base_values = [b.__dict__.values() for b in set(all_bases(bases))]
             attrs["events"] = defaultdict(list)
-            for member in members:
+            for member in sum(base_values, attrs.values()):
                 if hasattr(member, "event"):
                     attrs["events"][member.event.name].append(member)
             return type.__new__(cls, name, bases, attrs)
