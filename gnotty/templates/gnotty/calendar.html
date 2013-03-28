@@ -1,5 +1,8 @@
 {% extends "gnotty/base.html" %}
 
+{% load url from future %}
+
+
 {% block content %}
 {% for month in months %}
 
@@ -9,13 +12,13 @@
 
 <div class="span4">
 <table class="table table-striped calendar">
-    <tr><th colspan="7"><h2><a href="{% url gnotty_month month.month.year month.month.month %}">{{ month.month|date:"N Y" }}</a></h2></th></tr>
+    <tr><th colspan="7"><h2><a href="{% url 'gnotty_month' month.month.year month.month.month %}">{{ month.month|date:"N Y" }}</a></h2></th></tr>
     {% for week in month.weeks %}
     <tr>
     {% for day in week %}
     <td{% if not day.in_month %} class="not-in-month"{% endif %}>
         {% if day.has_messages %}
-        <a href="{% url gnotty_day day.date.year day.date.month day.date.day %}">{{ day.date.day }}</a>
+        <a href="{% url 'gnotty_day' day.date.year day.date.month day.date.day %}">{{ day.date.day }}</a>
         {% else %}
         {{ day.date.day }}
         {% endif %}

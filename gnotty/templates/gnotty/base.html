@@ -1,3 +1,4 @@
+{% load url from future %}
 {% load gnotty_tags %}<!doctype html>
 <html lang="en">
 
@@ -27,7 +28,7 @@
 <div class="navbar navbar-fixed-top">
 <div class="navbar-inner">
 <div class="container">
-    <a class="brand" href="{% url gnotty_chat %}">{{ IRC_CHANNEL }}</a>
+    <a class="brand" href="{% url 'gnotty_chat' %}">{{ IRC_CHANNEL }}</a>
     {% gnotty_nav %}
     <form id="joins-leaves" class="pull-right nav-collapse" action="#joins-leaves">
         <input type="checkbox" id="show-joins-leaves">
@@ -42,7 +43,7 @@
 </div>
 
 <footer>
-<form class="container form-inline chat" action="{% url gnotty_chat %}">
+<form class="container form-inline chat" action="{% url 'gnotty_chat' %}">
 <div class="row">
 <div class="span9 control-group">
 <div class="controls">

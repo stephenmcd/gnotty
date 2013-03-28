@@ -1,5 +1,8 @@
 {% extends "gnotty/base.html" %}
 
+{% load url from future %}
+
+
 {% block extrahead %}
 {{ block.super }}
 {% if request.GET.id %}
@@ -31,7 +34,7 @@ if (!location.hash) {
             {% if prev_url %}<li><a href="{{ prev_url }}" class="previous">&larr; Previous day</a></li>{% endif %}
             {% if next_url %}<li><a href="{{ next_url }}" class="next">Next day &rarr;</a></li>{% endif %}
         </ul>
-        <h2><a href="{% url gnotty_day day.year day.month day.day %}">{{ day }}</a></h2>
+        <h2><a href="{% url 'gnotty_day' day.year day.month day.day %}">{{ day }}</a></h2>
     </th>
 </tr>
 {% endifchanged %}
