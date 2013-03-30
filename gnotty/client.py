@@ -1,6 +1,6 @@
 
 from logging import getLogger
-from md5 import md5
+from hashlib import md5
 
 from irc.client import SimpleIRCClient, ServerConnectionError
 
