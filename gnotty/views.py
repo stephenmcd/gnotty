@@ -72,7 +72,11 @@ def calendar(request, year=None, month=None, template="gnotty/calendar.html"):
         lookup["join_or_leave"] = False
 
     messages = IRCMessage.objects.filter(**lookup)
-    days = [d.date() for d in messages.dates("message_time", "day")]
+    try:
+        dates = messages.datetimes("message_time", "day")
+    except AttributeError:
+        dates = messages.dates("message_time", "day")
+    days = [d.date() for d in dates]
     months = []
 
     if days:
