@@ -11,8 +11,10 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(PROJECT_ROOT, STATIC_URL.strip('/'))
 ROOT_URLCONF = '%s.urls' % PROJECT_ROOT.split(os.sep)[-1]
 TEMPLATE_DIRS = (os.path.join(PROJECT_ROOT, 'templates'),)
-DEBUG = False
+DEBUG = True
 SITE_ID = 1
+SECRET_KEY = "change me"
+ALLOWED_HOSTS = ["*"]
 
 DATABASES = {
     'default': {
@@ -62,7 +64,7 @@ GNOTTY_IRC_CHANNEL_KEY = None
 GNOTTY_BOT_CLASS = 'gnotty.bots.BaseBot'
 GNOTTY_BOT_NICKNAME = 'gnotty'
 GNOTTY_BOT_PASSWORD = None
-GNOTTY_LOGIN_REQUIRED = True
+GNOTTY_LOGIN_REQUIRED = False
 
 
 ##################
