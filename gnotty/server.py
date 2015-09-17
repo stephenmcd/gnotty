@@ -4,7 +4,7 @@ from __future__ import with_statement
 from gevent import monkey, spawn, sleep
 monkey.patch_all()
 
-from Cookie import Cookie
+from Cookie import SimpleCookie
 from cgi import FieldStorage
 from logging import getLogger, StreamHandler
 from mimetypes import guess_type
@@ -196,7 +196,7 @@ class IRCApplication(object):
                 from django.contrib.auth.models import User
                 from django.contrib.sessions.models import Session
                 from django.core.exceptions import ObjectDoesNotExist
-                cookie = Cookie(environ["HTTP_COOKIE"])
+                cookie = SimpleCookie(environ["HTTP_COOKIE"])
                 cookie_name = django_settings.SESSION_COOKIE_NAME
                 session_key = cookie[cookie_name].value
                 session = Session.objects.get(session_key=session_key)
